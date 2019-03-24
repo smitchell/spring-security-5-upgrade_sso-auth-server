@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: auth-service
+  main:
+    banner-mode: 'off'
