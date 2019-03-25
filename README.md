@@ -20,9 +20,9 @@ only affecting the test, or whether it is indicative of a configuration problem 
 
 ## Redirect Issues for AuthenticationTests.loginSucceeds() and AuthenticationTests.loginFailure()  
 
-I didn't see any redirect plumbing for login success the the existing code. Does that just go back to the Referrer by default? The loginSucceeds() and loginFailure() tests fail because 
-the forward is to "/" so it gets a 403 instead of a 302. How was this test passing with 1.5.13.RELEASE? You had a homePageProtected() test, so I know it was proected before. The issue 
-how the login success works with 2.1.3.RELEASE. 
+I didn't see any redirect plumbing for login success in the existing code. Does that just go back to the Referrer by default? 
+The loginSucceeds() and loginFailure() tests fail because the forward is to "/" so it gets a 403 instead of a 302. 
+How was this test passing with 1.5.13.RELEASE? You had a homePageProtected() test, so I know it was proected before. 
 
 ## AuthenticationTests.authToken() has no PasswordEncoder
 
