@@ -89,26 +89,20 @@
     There was a problem logging in. Please try again.
   </div>
 </#if>
-  <div class="container-fluid">
-    <div class="row">
-      <div class="col-sm-12 col-md-6 vertical-center">
-        <form role="form" action="login" method="post">
-          <h2>Login</h2>
-            <div class="form-group">
-              <label for="username">Username</label>
-              <input type="text" class="form-control underline" id="username" name="username" />
-            </div>
-            <div class="form-group">
-              <input type="password" placeholder="Password" class="form-control underline" id="password" name="password" />
-            </div>
-            <div class="form-group">
-              <button type="submit" class="btn btn-primary btn-lg pull-right btn-log">Log In</button>
-              <button type="button" class="btn btn-link btn-lg pull-right btn-log">Forgot Password?</button>
-            </div>
-            <input type="hidden" id="csrf_token" name="${_csrf.parameterName}" value="${_csrf.token}" />
-        </form>
+  <form role="form" action="login" method="post">
+    <h2>Login</h2>
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input type="text" class="form-control underline" id="username" name="username" />
       </div>
-    </div>
-  </div>
+      <div class="form-group">
+        <input type="password" placeholder="Password" class="form-control underline" id="password" name="password" />
+      </div>
+      <div class="form-group">
+        <button type="submit" class="btn btn-primary btn-lg pull-right btn-log">Log In</button>
+        <button type="button" class="btn btn-link btn-lg pull-right btn-log">Forgot Password?</button>
+      </div>
+      <input type="hidden" id="csrf_token" name="${_csrf.parameterName}" value="${_csrf.token}" />
+  </form>
 </body>
 </html>

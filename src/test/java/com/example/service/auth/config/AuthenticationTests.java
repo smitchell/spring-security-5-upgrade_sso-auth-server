@@ -145,7 +145,7 @@ public class AuthenticationTests {
     form.set("password", "password");
     form.set("_csrf", csrf);
 
-    MvcResult loginPost = mockMvc.perform(post("/login")
+    mockMvc.perform(post("/login")
         .params(form))
 //        .cookie(loginPage.getResponse().getCookies()))
         .andExpect(status().isFound())
