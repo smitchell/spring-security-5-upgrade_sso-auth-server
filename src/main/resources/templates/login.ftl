@@ -38,8 +38,8 @@
       box-sizing: border-box;
       font-size: 18px;
       padding: 0 20px 20px 0;
-      margin-top: 0px;
-      margin-right: 0px;
+      margin-top: 0;
+      margin-right: 0;
       margin-bottom: 20px;
       margin-left: 20px;
       max-width: calc(100% - 40px);
@@ -91,13 +91,9 @@
 </#if>
   <div class="container-fluid">
     <div class="row">
-      <div class="col-sm-12 col-md-6 frame logo hidden-sm hidden-xs">
-        <span class="helper"></span>
-        <img src="https://www.medzero.com/assets/logo.svg" alt="medZERO logo">
-      </div>
       <div class="col-sm-12 col-md-6 vertical-center">
         <form role="form" action="login" method="post">
-          <h2>medZERO Login</h2>
+          <h2>Login</h2>
             <div class="form-group">
               <label for="username">Username</label>
               <input type="text" class="form-control underline" id="username" name="username" />
