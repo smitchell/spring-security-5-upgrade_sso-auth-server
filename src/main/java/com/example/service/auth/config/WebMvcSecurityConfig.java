@@ -94,14 +94,13 @@ public class WebMvcSecurityConfig implements WebMvcConfigurer {
 
       // @formatter:off
       http
-        .formLogin().loginPage(LOGIN).permitAll()
-          .and()
-        .requestMatchers().antMatchers(LOGIN, "/oauth/authorize", "/oauth/confirm_access")
+          .requestMatchers().antMatchers(LOGIN, "/oauth/authorize", "/oauth/confirm_access")
             .and()
-            .logout()
-          .permitAll()
-          .and()
-        .authorizeRequests().anyRequest().authenticated();
+            .logout().permitAll()
+            .and()
+         .authorizeRequests().anyRequest().authenticated()
+            .and()
+         .formLogin().loginPage(LOGIN).permitAll();
       // @formatter:on
     }
 

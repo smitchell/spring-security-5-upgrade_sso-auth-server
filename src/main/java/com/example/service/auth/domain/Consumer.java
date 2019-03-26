@@ -102,7 +102,8 @@ public class Consumer implements ClientDetails, Serializable {
     if (registeredRedirectUrisCsv != null) {
       return new HashSet<>(Arrays.asList(registeredRedirectUrisCsv.split(",")));
     }
-    return Collections.emptySet();
+    return Collections.singleton("https://www.medzero.com");
+//    return Collections.emptySet();
   }
 
   @Override
@@ -123,7 +124,7 @@ public class Consumer implements ClientDetails, Serializable {
     if (autoApproveCsv == null) {
       return false;
     }
-    for (String auto : Arrays.asList(autoApproveCsv.split(","))) {
+    for (String auto : autoApproveCsv.split(",")) {
       if ("true".equals(auto) || scope.matches(auto)) {
         return true;
       }

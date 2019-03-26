@@ -18,8 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class UserController {
 
-  public static final String PASSWORD = "PASSWORD";
-  public static final String USER_ID = "USER_ID";
+  private static final String PASSWORD = "PASSWORD";
+  private static final String USER_ID = "USER_ID";
   private static final Logger LOG = LoggerFactory.getLogger(UserController.class);
   private static final String MISSING_PARAM_MSG = "%s must not be null.";
   private UserRepository userRepository;
@@ -40,8 +40,6 @@ public class UserController {
       Assert.hasText(password, String.format(MISSING_PARAM_MSG, "password"));
       Assert.isTrue(new RegexValidator(ValidationRegex.BCRYPT_PATTERN).isValid(password),
           "password is invalid: ".concat(password));
-      LOG.debug("UserController.updateUserPassword: username <--- ".concat(username));
-      LOG.debug("UserController.updateUserPassword: password <--- ".concat(password));
       Optional<User> user = userRepository.findByUsername(username);
       if (user.isPresent()) {
         user.get().setPassword(password);
@@ -64,12 +62,10 @@ public class UserController {
       Assert.isTrue(new RegexValidator(ValidationRegex.UUID_PATTERN).isValid(username),
           "username is invalid: ".concat(username));
       Assert.hasText(password, String.format(MISSING_PARAM_MSG, "password"));
-      LOG.debug("UserController.verifyUsernameAndPassword: username <--- ".concat(username));
-      LOG.debug("UserController.verifyUsernameAndPassword: password <--- ".concat(password));
       Optional<User> user = userRepository.findByUsername(username);
       if (user.isPresent()) {
         LOG.debug("User found: ", user.get());
-        Boolean matches = new BCryptPasswordEncoder().matches(password, user.get().getPassword());
+        boolean matches = new BCryptPasswordEncoder().matches(password, user.get().getPassword());
         if (matches) {
           LOG.debug("Password matches");
           return Boolean.TRUE;

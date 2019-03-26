@@ -14,6 +14,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.example.service.auth.service.AuthClientDetailsService;
 import com.example.service.auth.service.AuthUserDetailsService;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -83,6 +84,7 @@ public class AuthenticationTests {
     Mockito.when(this.clientDetails.getAuthorizedGrantTypes()).thenReturn(grants);
     Mockito.when(this.clientDetails.getRefreshTokenValiditySeconds()).thenReturn(100);
     Mockito.when(this.clientDetails.getClientId()).thenReturn("dummy-client");
+    Mockito.when(this.clientDetails.getRegisteredRedirectUri()).thenReturn(Collections.singleton("https://www.medzero.com"));
     Mockito.when(this.clientDetails.isSecretRequired())
         .thenReturn(Boolean.TRUE);
     Mockito.when(this.clientDetails.getClientSecret())
