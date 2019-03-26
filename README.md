@@ -3,21 +3,6 @@
 This project is meant to help troubleshoot problems encountered upgrading our authentication server from 
 Spring Boot 1.5.13.RELEASE to 2.1.3.RELEASE.
 
-## Cookies are Null for AuthenticationTests.loginSucceeds() and AuthenticationTests.loginFailure()  
-
-There used to be cookies with 1.5.13.RELEASE, now there aren't with 2.1.3.RELEASE. I commented out the check for now. I wasn't sure if this is
-only affecting the test, or whether it is indicative of a configuration problem that I need to resolve.
-
-```    
-     mockMvc.perform(post("/login")  
-         .params(form))  
-         // .cookie(loginPage.getResponse().getCookies()))  
-         .andExpect(status().isFound())  
-         .andExpect(header().string("Location", "/"))  
-         .andDo(document("login-submit"))  
-         .andReturn();  
-```
-
 ## Redirect Issues for AuthenticationTests.loginSucceeds() and AuthenticationTests.loginFailure()  
 
 I didn't see any redirect plumbing for login success in the existing code. Does that just go back to the Referrer by default? 

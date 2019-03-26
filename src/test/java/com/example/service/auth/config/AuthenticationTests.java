@@ -8,6 +8,7 @@ import static org.springframework.restdocs.request.RequestDocumentation.requestP
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.cookie;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -147,7 +148,8 @@ public class AuthenticationTests {
 
     mockMvc.perform(post("/login")
         .params(form))
-//        .cookie(loginPage.getResponse().getCookies()))
+//        .andDo(MockMvcResultHandlers.print())
+        .andExpect(cookie().exists("SESSION"))
         .andExpect(status().isFound())
         .andExpect(header().string("Location", "/"))
         .andDo(document("login-submit"))
@@ -167,9 +169,10 @@ public class AuthenticationTests {
     form.set("password", "notpassword");
     form.set("_csrf", csrf);
 
-    MvcResult loginPost = mockMvc.perform(post("/login")
+    mockMvc.perform(post("/login")
         .params(form))
-//        .cookie(loginPage.getResponse().getCookies()))  // WHY ARE COOKIES NULL IN SPRING SECURITY 5.x
+//        .andDo(MockMvcResultHandlers.print())
+        .andExpect(cookie().exists("SESSION"))
         .andExpect(status().isFound())
         .andExpect(header().string("Location", "/login?error"))
         .andReturn();
