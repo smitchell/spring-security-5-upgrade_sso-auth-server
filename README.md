@@ -43,8 +43,8 @@ https://auth-service-test-examle.cfapps.io/oauth/authorize?client_id=proxy-servi
 ```
 
 It appears one solution is to add redirectUris() to the ClientDetailsServiceConfigurer, but we were not doing that with 1.5.13.RELEASE and everything worked.
-Also, that redirectUris() method doesn't exist on ClientDetailsServiceConfigurer.withClientDetails(). I'm sure what needs to be called on the ClientDetailsServiceConfigurer
-to get to the redirectUris() method when using withClientDetails(). 
+Also, that redirectUris() method doesn't exist on ClientDetailsServiceConfigurer.withClientDetails(). I'm not sure what needs to be called on the ClientDetailsServiceConfigurer
+to be added after withClientDetails() to get to the redirectUris() method. 
 
 ```
   @Override
