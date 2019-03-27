@@ -42,9 +42,7 @@ https://auth-service-test-examle.cfapps.io/oauth/authorize?client_id=proxy-servi
    error="invalid_request", error_description="At least one redirect_uri must be registered with the client."
 ```
 
-It appears one solution is to add redirectUris() to the ClientDetailsServiceConfigurer, but we were not doing that with 1.5.13.RELEASE and everything worked.
-Also, that redirectUris() method doesn't exist on ClientDetailsServiceConfigurer.withClientDetails(). I'm not sure what needs to be called on the ClientDetailsServiceConfigurer
-to be added after withClientDetails() to get to the redirectUris() method. 
+It appears one solution may be to add redirectUris() to the ClientDetailsServiceConfigurer, but we were not doing that with 1.5.13.RELEASE and everything worked. Also, the redirectUris() method doesn't exist on ClientDetailsServiceConfigurer.withClientDetails(). I'm not sure what needs to be added on the ClientDetailsServiceConfigurer (e.g. .and().something()) to get access to the redirectUris() method.
 
 ```
   @Override
