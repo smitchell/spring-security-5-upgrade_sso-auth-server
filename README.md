@@ -30,8 +30,13 @@ Cloud Foundry, I get the following behavior:
 
 2) The browser is redirected to that authorization server Login page
 4) User posts credentials to the login endpoint on the authorization server.
-5) Authorization server *should* redirect browser back to the site home page, but I get this error:
+5) Authorization server *should* redirect browser back to the site home page, but doesn't.
+
+After the POST to /login here is the URL and the error. Subsequent attempts to access the site bypass the Login page and go directly to the error.
+
 ```
+https://auth-service-test-examle.cfapps.io/oauth/authorize?client_id=proxy-service&redirect_uri=http://test.example.com/login&response_type=code&state=QihbF4
+
    OAuth Error
    
    error="invalid_request", error_description="At least one redirect_uri must be registered with the client."
