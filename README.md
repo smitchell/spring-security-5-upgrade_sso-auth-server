@@ -1,27 +1,45 @@
-# SPRING SECURITY 5.X AUTHENTICATION SERVER UPGRADE TROUBLESHOOTING
+# SPRING SECURITY 5.X AUTHORIZATION SERVER UPGRADE TROUBLESHOOTING
 
-This project is meant to help troubleshoot problems encountered upgrading our authentication server from 
-Spring Boot 1.5.13.RELEASE to 2.1.3.RELEASE.
+The purpose of this repository is to troubleshoot problems encountered upgrading our authorization server from Spring Boot 1.5.13.RELEASE to 2.1.3.RELEASE.
 
-## Redirects Stopped Working
+## 1) Redirects Stopped Working
 
 Following the upgrade to Spring Boot 2.1.3.RELEASE the AuthenticationTests.loginSucceeds() and loginFailure() tests fail because there is no redirect.
-Login falls through to "/," so it results in a 403 instead of a 302. 
+Login falls through to "/," which is a protected resource on the authorization server, so it results in a 403 instead of a 302. 
 
-If I deploy to Test, I get the following behavior:
-1) Browser attempts a REST call to the API on the gateway server (configured as resource server)
-2) Proxy service (Zuul) checks for OAuth2 token
-3) Browser redirected to login page on the authentication server.
-4) Browser posts credentials to the authentication server.
-5) Authorization server *should* redirect to the original endpoint on the API, but instead this error is returned.
+We see a problem when we deploy the upgraded authorization server too. The web sites rely on the proxy server and authorization server for security. 
+All the resource servers sit behind a Zuul proxy giving us SSO sign-on through the authorization service. When I deploy this upgraded authorization service to 
+Cloud Foundry, I get the following behavior: 
 
+1) The browser makes a REST call to a protected endpoint on the proxy server (Spring Boot 1.5 Zuul)
+
+```
+  // Proxy server where "matches" is an array of unsecured resources.
+  protected void configure(HttpSecurity http) throws Exception {
+      http
+          .logout()
+          .invalidateHttpSession(true).permitAll()
+          .logoutSuccessUrl(logoutSuccessUrl)
+          .and()
+          .authorizeRequests()
+          .antMatchers(matches).permitAll()
+          .anyRequest().authenticated();
+      ;
+    }
+```
+
+2) The browser is redirected to that authorization server Login page
+4) User posts credentials to the login endpoint on the authorization server.
+5) Authorization server *should* redirect browser back to the site home page, but I get this error:
 ```
    OAuth Error
    
    error="invalid_request", error_description="At least one redirect_uri must be registered with the client."
 ```
 
-It appears the solution is to add redirectUris() to the ClientDetailsServiceConfigurer, but that isn't an option with our configuration.
+It appears one solution is to add redirectUris() to the ClientDetailsServiceConfigurer, but we were not doing that with 1.5.13.RELEASE and everything worked.
+Also, that redirectUris() method doesn't exist on ClientDetailsServiceConfigurer.withClientDetails(). I'm sure what needs to be called on the ClientDetailsServiceConfigurer
+to get to the redirectUris() method when using withClientDetails(). 
 
 ```
   @Override
@@ -30,7 +48,10 @@ It appears the solution is to add redirectUris() to the ClientDetailsServiceConf
   }
 ```
 
-## AuthenticationTests.authToken() has no PasswordEncoder
+Honestly, I don't know what header was used before with Spring Boot 1.5.13.RELEASE for redirects. I assume that the REFERRER header was used for the redirect. Is that right? All I 
+know is that a successful login the user ended up back on the homepage of whichever site he/she tried to access. That no longer works.
+
+## 2) AuthenticationTests.authToken() has no PasswordEncoder
 
 The authToken() test fails because "There is no PasswordEncoder mapped for the id "null". I'm not sure what has changed with 2.1.3.RELEASE to cause this test to start failing.
 
