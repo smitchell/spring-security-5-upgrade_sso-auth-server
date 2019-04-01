@@ -24,8 +24,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
   private final AuthenticationConfiguration authenticationConfiguration;
 
-  private AuthenticationManager authenticationManager;
-
   @Autowired
   public WebSecurityConfig(final AuthenticationConfiguration authenticationConfiguration, final AuthUserDetailsService authUserDetailsService) {
     this.authenticationConfiguration = authenticationConfiguration;
@@ -35,7 +33,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
   @Override
   public void configure(AuthenticationManagerBuilder auth) throws Exception {
     auth
-        .parentAuthenticationManager(authenticationManager)
+        .parentAuthenticationManager(authenticationConfiguration.getAuthenticationManager())
         .userDetailsService(authUserDetailsService)
         .passwordEncoder(new BCryptPasswordEncoder());
   }
