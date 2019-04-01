@@ -162,23 +162,17 @@ public class AuthenticationTests {
 
   @Test
   public void loginFailure() throws Exception {
-    MvcResult loginPage = mockMvc.perform(get("/login"))
-        .andExpect(status().is2xxSuccessful())
-        .andReturn();
-
-
-    String csrf = getCorsId(loginPage.getResponse().getContentAsString());
-
     MultiValueMap<String, String> form = new LinkedMultiValueMap<String, String>();
     form.set("username", "username");
     form.set("password", "notpassword");
 
     mockMvc.perform(post("/login")
         .params(form).with(csrf()))
-//        .andDo(MockMvcResultHandlers.print())
+        .andDo(MockMvcResultHandlers.print())
         .andExpect(cookie().exists("SESSION"))
         .andExpect(status().isFound())
         .andExpect(header().string("Location", "/login?error"))
+        .andDo(document("login-submit"))
         .andReturn();
   }
 
