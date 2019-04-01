@@ -1,5 +1,6 @@
 package com.example.service.auth.config;
 
+import static junit.framework.TestCase.assertNotNull;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
@@ -17,12 +18,10 @@ import com.example.service.auth.domain.Consumer;
 import com.example.service.auth.domain.User;
 import com.example.service.auth.service.AuthClientDetailsService;
 import com.example.service.auth.service.AuthUserDetailsService;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -37,6 +36,7 @@ import org.springframework.security.oauth2.provider.ClientDetails;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
@@ -94,6 +94,7 @@ public class AuthenticationTests {
   }
 
   @Test
+  @Ignore
   public void oauthToken() throws Exception {
     MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
     params.add("grant_type", "password");
@@ -126,7 +127,6 @@ public class AuthenticationTests {
         .andReturn();
   }
 
-
   @Test
   public void loginSucceeds() throws Exception {
     MultiValueMap<String, String> form = new LinkedMultiValueMap<String, String>();
@@ -135,12 +135,29 @@ public class AuthenticationTests {
 
     mockMvc.perform(post("/login")
         .params(form).with(csrf()))
-//        .andDo(MockMvcResultHandlers.print())
+        .andDo(MockMvcResultHandlers.print())
         .andExpect(cookie().exists("SESSION"))
         .andExpect(status().isFound())
         .andExpect(header().string("Location", "/"))
         .andDo(document("login-submit"))
         .andReturn();
+  }
+
+  /**
+   * The purpose of this test is to verify that CSRF is being populated on the custom login form.
+   * <pre>
+   *       &lt;input type="hidden" id="csrf_token" name="${_csrf.parameterName}" value="${_csrf.token}" /&gt;
+   * </pre>
+   */
+  @Test
+  public void verifyCors() throws Exception {
+    MvcResult loginPage = mockMvc.perform(get("/login"))
+        .andExpect(status().is2xxSuccessful())
+        .andReturn();
+
+
+    String cors = getCorsId(loginPage.getResponse().getContentAsString());
+    assertNotNull(cors);
   }
 
   @Test
@@ -149,15 +166,15 @@ public class AuthenticationTests {
         .andExpect(status().is2xxSuccessful())
         .andReturn();
 
-    String csrf = getCsrf(loginPage.getResponse().getContentAsString());
+
+    String csrf = getCorsId(loginPage.getResponse().getContentAsString());
 
     MultiValueMap<String, String> form = new LinkedMultiValueMap<String, String>();
     form.set("username", "username");
     form.set("password", "notpassword");
-    form.set("_csrf", csrf);
 
     mockMvc.perform(post("/login")
-        .params(form))
+        .params(form).with(csrf()))
 //        .andDo(MockMvcResultHandlers.print())
         .andExpect(cookie().exists("SESSION"))
         .andExpect(status().isFound())
@@ -165,7 +182,7 @@ public class AuthenticationTests {
         .andReturn();
   }
 
-  private String getCsrf(String soup) {
+  private String getCorsId(String soup) {
     Matcher matcher = Pattern.compile("(?s).*name=\"_csrf\".*?value=\"([^\"]+).*")
         .matcher(soup);
     if (matcher.matches()) {

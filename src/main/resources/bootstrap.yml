@@ -3,3 +3,5 @@ spring:
     name: auth-service
   main:
     banner-mode: 'off'
+  thymeleaf:
+    cache: false
