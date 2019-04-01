@@ -5,6 +5,7 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.pr
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -12,6 +13,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.example.service.auth.domain.Consumer;
+import com.example.service.auth.domain.User;
 import com.example.service.auth.service.AuthClientDetailsService;
 import com.example.service.auth.service.AuthUserDetailsService;
 import java.util.Collections;
@@ -49,10 +52,8 @@ public class AuthenticationTests {
   @MockBean
   AuthClientDetailsService authClientDetailsService;
 
-  @MockBean
   ClientDetails clientDetails;
 
-  @MockBean
   UserDetails userDetails;
 
   @Autowired
@@ -60,35 +61,27 @@ public class AuthenticationTests {
 
   @Before
   public void before() {
+    User user = new User();
+    user.setPassword(new BCryptPasswordEncoder().encode("password"));
+    user.setActive(true);
+    user.setUsername("username");
+    this.userDetails = user;
 
-    Mockito.when(this.userDetails.getPassword())
-        .thenReturn(new BCryptPasswordEncoder().encode("password"));
-    Mockito.when(this.userDetails.isEnabled()).thenReturn(Boolean.TRUE);
-    Mockito.when(this.userDetails.isAccountNonLocked()).thenReturn(Boolean.TRUE);
-    Mockito.when(this.userDetails.isAccountNonExpired()).thenReturn(Boolean.TRUE);
-    Mockito.when(this.userDetails.isCredentialsNonExpired()).thenReturn(Boolean.TRUE);
-    Mockito.when(this.userDetails.getUsername()).thenReturn("username");
     Mockito.when(this.authUserDetailsService.loadUserByUsername("dummy-client"))
         .thenReturn(userDetails);
     Mockito.when(this.authUserDetailsService.loadUserByUsername("username"))
         .thenReturn(userDetails);
 
-    Set<String> scopes = new HashSet<>();
-    scopes.add("read");
-    scopes.add("write");
-    Set<String> grants = new HashSet<>();
-    grants.add("password");
-    grants.add("refresh_token");
-    Mockito.when(this.clientDetails.getScope()).thenReturn(scopes);
-    Mockito.when(this.clientDetails.getAccessTokenValiditySeconds()).thenReturn(100);
-    Mockito.when(this.clientDetails.getAuthorizedGrantTypes()).thenReturn(grants);
-    Mockito.when(this.clientDetails.getRefreshTokenValiditySeconds()).thenReturn(100);
-    Mockito.when(this.clientDetails.getClientId()).thenReturn("dummy-client");
-    Mockito.when(this.clientDetails.getRegisteredRedirectUri()).thenReturn(Collections.singleton("https://www.medzero.com"));
-    Mockito.when(this.clientDetails.isSecretRequired())
-        .thenReturn(Boolean.TRUE);
-    Mockito.when(this.clientDetails.getClientSecret())
-        .thenReturn(new BCryptPasswordEncoder().encode("password"));
+    Consumer consumer = new Consumer();
+    consumer.setScopeCsv("read,write");
+    consumer.setAuthorizedGrantTypesCsv("password,refresh_token");
+    consumer.setAccessTokenValiditySeconds(100);
+    consumer.setRefreshTokenValiditySeconds(100);
+    consumer.setClientId("dummy-client");
+    consumer.setRegisteredRedirectUrisCsv("https://www.medzero.com");
+    consumer.setClientSecret(new BCryptPasswordEncoder().encode("password"));
+    this.clientDetails = consumer;
+
     Mockito.when(this.authClientDetailsService.loadClientByClientId("dummy-client"))
         .thenReturn(clientDetails);
   }
@@ -136,20 +129,12 @@ public class AuthenticationTests {
 
   @Test
   public void loginSucceeds() throws Exception {
-    MvcResult loginPage = mockMvc.perform(get("/login"))
-        .andExpect(status().is2xxSuccessful())
-        .andDo(document("login"))
-        .andReturn();
-
-    String csrf = getCsrf(loginPage.getResponse().getContentAsString());
-
     MultiValueMap<String, String> form = new LinkedMultiValueMap<String, String>();
     form.set("username", "username");
     form.set("password", "password");
-    form.set("_csrf", csrf);
 
     mockMvc.perform(post("/login")
-        .params(form))
+        .params(form).with(csrf()))
 //        .andDo(MockMvcResultHandlers.print())
         .andExpect(cookie().exists("SESSION"))
         .andExpect(status().isFound())
