@@ -134,6 +134,7 @@ public class AuthenticationTests {
     form.set("password", "password");
 
     mockMvc.perform(post("/login")
+        .header("referer", "https://www.medzero.com")
         .params(form).with(csrf()))
         .andDo(MockMvcResultHandlers.print())
         .andExpect(cookie().exists("SESSION"))
