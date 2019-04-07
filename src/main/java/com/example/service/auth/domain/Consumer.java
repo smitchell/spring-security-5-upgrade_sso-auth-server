@@ -102,7 +102,7 @@ public class Consumer implements ClientDetails, Serializable {
     if (registeredRedirectUrisCsv != null) {
       return new HashSet<>(Arrays.asList(registeredRedirectUrisCsv.split(",")));
     }
-    return Collections.singleton("https://www.medzero.com");
+    return Collections.emptySet();
 //    return Collections.emptySet();
   }
 
@@ -143,7 +143,7 @@ public class Consumer implements ClientDetails, Serializable {
   public Collection<GrantedAuthority> getAuthorities() {
     if (authorityCsv != null) {
       Set<GrantedAuthority> grantedAuthorityList = new HashSet<>();
-      for (String authority : Arrays.asList(authorityCsv.split(","))) {
+      for (String authority : authorityCsv.split(",")) {
         grantedAuthorityList.add(new SimpleGrantedAuthority(authority));
       }
       return grantedAuthorityList;
