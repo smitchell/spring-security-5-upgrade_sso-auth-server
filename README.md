@@ -2,53 +2,33 @@
 
 The purpose of this repository is to troubleshoot problems encountered upgrading our authorization server from Spring Boot 1.5.13.RELEASE to 2.1.3.RELEASE.
 
-## Redirects Stopped Working
+## Summary
 
-Following the upgrade to Spring Boot 2.1.3.RELEASE the AuthenticationTests.loginSucceeds() and loginFailure() tests fail because there is no redirect.
-Login falls through to "/," which is a protected resource on the authorization server, so it results in a 403 instead of a 302. 
+After upgrading an existing authentication server to Spring Boot 2, the shared custom login page in the authentication service no longer redirects the user back to the original protected URI.
+Actual Behavior
 
-We see a problem when we deploy the upgraded authorization server too. The web sites rely on the proxy server and authorization server for security. 
-All the resource servers sit behind a Zuul proxy giving us SSO sign-on through the authorization service. When I deploy this upgraded authorization service to 
-Cloud Foundry, I get the following behavior: 
-
-1) The browser makes a REST call to a protected endpoint on the proxy server (Spring Boot 1.5 Zuul)
-
-```
-  // Proxy server where "matches" is an array of unsecured resources.
-  protected void configure(HttpSecurity http) throws Exception {
-      http
-          .logout()
-          .invalidateHttpSession(true).permitAll()
-          .logoutSuccessUrl(logoutSuccessUrl)
-          .and()
-          .authorizeRequests()
-          .antMatchers(matches).permitAll()
-          .anyRequest().authenticated();
-      ;
-    }
-```
-
-2) The browser is redirected to that authorization server Login page
-4) User posts credentials to the login endpoint on the authorization server.
-5) Authorization server *should* redirect browser back to the site home page, but doesn't.
-
-After the POST to /login here is the URL and the error. Subsequent attempts to access the site bypass the Login page and go directly to the error.
+1) The user attempts to access a protected, proxied web resource.
+2) The user is redirected to the shared, custom login page in the authentication service.
+3) The user posts her credentials.
+4) Instead of being redirected back to the original website, the error below displays on the page.
 
 ```
-https://auth-service-test-examle.cfapps.io/oauth/authorize?client_id=proxy-service&redirect_uri=http://test.example.com/login&response_type=code&state=QihbF4
-
-   OAuth Error
-   
-   error="invalid_request", error_description="At least one redirect_uri must be registered with the client."
+OAuth Error
+error="invalid_request", error_description="At least one redirect_uri must be registered with the client."
 ```
 
-It appears one solution may be to add redirectUris() to the ClientDetailsServiceConfigurer, but we were not doing that with 1.5.13.RELEASE and everything worked. Also, the redirectUris() method doesn't exist on ClientDetailsServiceConfigurer.withClientDetails(). I'm not sure what needs to be added on the ClientDetailsServiceConfigurer (e.g. .and().something()) to get access to the redirectUris() method.
+## Expected Behavior
 
-```
-  @Override
-  public void configure(final ClientDetailsServiceConfigurer clients) throws Exception {
-    clients.withClientDetails(authClientDetailsService);
-  }
-```
+Upon successful authentication, the browser should be redirected back to the original website.
+Configuration
 
-Honestly, I don't know what header was used before with Spring Boot 1.5.13.RELEASE for redirects. I assume that the "referer" header was used for the redirect. Is that right? All I know is that afer a successful login the user ended up back on the homepage of whichever site he/she tried to access. That no longer works.
+I scoured our production authentication service for configuration settings specific to the redirect URI but found none. We use a custom ClientDetails object, and its getRegisteredRedirectUri() method always returns an empty Set. Despite that, users get redirected to the original URI after Login. That is no longer the case after upgrading to Spring Boot 2.
+
+I have not been able to recreate the "At least one redirect_uri must be registered with the client." error with a unit test. I would like to be able to do that so I could set a breakpoint and step through what is happening.
+
+## Version
+
+The working production code is running 1.5.13.RELEASE. The updated code is running 2.1.3.RELEASE
+
+## Spring Security Issue:
+https://github.com/spring-projects/spring-security/issues/6758
