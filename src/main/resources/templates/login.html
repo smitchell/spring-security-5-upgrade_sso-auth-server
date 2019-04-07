@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       xmlns:th="http://www.thymeleaf.org">
 <head>
   <link rel="stylesheet" type="text/css"
@@ -87,25 +86,22 @@
   </style>
 </head>
 <body>
-<#if RequestParameters['error']??>
-	<div class="alert alert-danger">
-    There was a problem logging in. Please try again.
-  </div>
-</#if>
-  <form role="form" action="login" method="post">
+  <form method="post" th:action="@{/login}">
     <h2>Login</h2>
-      <div class="form-group">
-        <label for="username">Username</label>
-        <input type="text" class="form-control underline" id="username" name="username" />
-      </div>
-      <div class="form-group">
-        <input type="password" placeholder="Password" class="form-control underline" id="password" name="password" />
-      </div>
-      <div class="form-group">
-        <button type="submit" class="btn btn-primary btn-lg pull-right btn-log">Log In</button>
-        <button type="button" class="btn btn-link btn-lg pull-right btn-log">Forgot Password?</button>
-      </div>
-      <input type="hidden" id="csrf_token" name="${_csrf.parameterName}" value="${_csrf.token}" />
+    <div class="alert alert-danger" th:if="${param.error}" role="alert">There was a problem logging in. Please try again.</div>
+    <div class="alert alert-danger" th:if="${param.logout}" role="alert">You have been logged out.</div>
+    <div class="form-group">
+      <label for="username">Username</label>
+      <input type="text" class="form-control underline" id="username" name="username" />
+    </div>
+    <div class="form-group">
+      <input type="password" placeholder="Password" class="form-control underline" id="password" name="password" />
+    </div>
+    <div class="form-group">
+      <button type="submit" class="btn btn-primary btn-lg pull-right btn-log">Log In</button>
+      <button type="button" class="btn btn-link btn-lg pull-right btn-log">Forgot Password?</button>
+    </div>
+    <input type="hidden" id="csrf_token" name="${_csrf.parameterName}" value="${_csrf.token}" />
   </form>
 </body>
 </html>
