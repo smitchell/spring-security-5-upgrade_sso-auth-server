@@ -1,30 +1,19 @@
 package com.example.service.auth.config;
 
-import static junit.framework.TestCase.assertNotNull;
-import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
-import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
-import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.cookie;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.example.service.auth.domain.Consumer;
 import com.example.service.auth.domain.User;
 import com.example.service.auth.service.AuthClientDetailsService;
 import com.example.service.auth.service.AuthUserDetailsService;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import io.micrometer.core.annotation.TimedSet;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -33,12 +22,30 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.provider.ClientDetails;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+
+import static junit.framework.TestCase.assertNotNull;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.cookie;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.forwardedUrl;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -74,7 +81,7 @@ public class AuthenticationTests {
 
     Consumer consumer = new Consumer();
     consumer.setScopeCsv("read,write");
-    consumer.setAuthorizedGrantTypesCsv("password,refresh_token");
+    consumer.setAuthorizedGrantTypesCsv("password,refresh_token,authorization_code");
     consumer.setAccessTokenValiditySeconds(100);
     consumer.setRefreshTokenValiditySeconds(100);
     consumer.setClientId("dummy-client");
@@ -139,9 +146,19 @@ public class AuthenticationTests {
         .andDo(MockMvcResultHandlers.print())
         .andExpect(cookie().exists("SESSION"))
         .andExpect(status().isFound())
-        .andExpect(header().string("Location", "/"))
+        .andExpect(redirectedUrl("/"))
         .andDo(document("login-submit"))
         .andReturn();
+  }
+
+  @Test
+  @WithMockUser
+  public void authorizationRedirectsAfterLogin() throws Exception {
+    mockMvc.perform(get("/oauth/authorize")
+            .param("client_id", "dummy-client")
+            .param("response_type", "code")
+            .with(user("username")))
+            .andExpect(forwardedUrl("/oauth/confirm_access"));
   }
 
   /**
