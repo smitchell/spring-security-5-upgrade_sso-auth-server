@@ -6,13 +6,15 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Component
 @EnableResourceServer
 public class WebMvcSecurityConfig implements WebMvcConfigurer {
-
+  private static final String[] RESOURCE_LOCATIONS = {
+      "classpath:/META-INF/resources/", "classpath:/resources/" };
   private static final String LOGIN = "/login";
 
   @Override
@@ -34,5 +36,16 @@ public class WebMvcSecurityConfig implements WebMvcConfigurer {
     return new CorsFilter(source);
   }
 
+  @Override
+  public void addResourceHandlers(ResourceHandlerRegistry registry) {
+    if (!registry.hasMappingForPattern("/webjars/**")) {
+      registry.addResourceHandler("/webjars/**").addResourceLocations(
+          "classpath:/META-INF/resources/webjars/");
+    }
+    if (!registry.hasMappingForPattern("/**")) {
+      registry.addResourceHandler("/**").addResourceLocations(
+          RESOURCE_LOCATIONS);
+    }
+  }
 
 }

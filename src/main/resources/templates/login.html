@@ -3,14 +3,15 @@
       xmlns:th="http://www.thymeleaf.org">
 <head>
   <title>Login</title>
+  <link rel="icon" href="/icon.png" type="image/png"/>
   <link rel="stylesheet" type="text/css"
-        href="webjars/bootstrap/3.3.7-1/css/bootstrap.min.css"/>
-  <script type="text/javascript" src="webjars/jquery/2.2.4/jquery.min.js"></script>
+        href="webjars/bootstrap/4.3.1/css/bootstrap.min.css"/>
+  <script type="text/javascript" src="webjars/jquery/3.3.1-2/jquery.min.js"></script>
   <script type="text/javascript"
-          src="webjars/bootstrap/3.3.7-1/js/bootstrap.min.js"></script>
+          src="webjars/bootstrap/4.3.1/js/bootstrap.min.js"></script>
   <style>
     .frame {
-      height: 100%;
+      height: auto;
     }
 
     .vertical-center {
@@ -87,22 +88,33 @@
   </style>
 </head>
 <body>
-  <form method="post" th:action="@{/login}">
-    <h2>Login</h2>
-    <div class="alert alert-danger" th:if="${param.error}" role="alert">There was a problem logging in. Please try again.</div>
-    <div class="alert alert-danger" th:if="${param.logout}" role="alert">You have been logged out.</div>
-    <div class="form-group">
-      <label for="username">Username</label>
-      <input type="text" class="form-control underline" id="username" name="username" />
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-sm-12 col-md-6 frame logo hidden-sm hidden-xs">
+      <span class="helper"></span>
+      <img src="https://www.medzero.com/assets/logo.svg" alt="medZERO logo">
     </div>
-    <div class="form-group">
-      <input type="password" placeholder="Password" class="form-control underline" id="password" name="password" />
+    <div class="col-sm-12 col-md-6 vertical-center">
+      <div class="alert alert-danger" th:if="${param.error}" role="alert">There was a problem logging in. Please try again.</div>
+      <div class="alert alert-danger" th:if="${param.logout}" role="alert">You have been logged out.</div>
+
+      <form method="post" th:action="@{/login}">
+        <h2>medZERO Login</h2>
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input type="text" class="form-control underline" id="username" name="username" />
+        </div>
+        <div class="form-group">
+          <input type="password" placeholder="Password" class="form-control underline" id="password" name="password" />
+        </div>
+        <div class="form-group">
+          <button type="submit" class="btn btn-primary btn-lg pull-right btn-log">Log In</button>
+          <button type="button" class="btn btn-link btn-lg pull-right btn-log">Forgot Password?</button>
+        </div>
+        <input type="hidden" id="csrf_token" name="${_csrf.parameterName}" value="${_csrf.token}" />
+      </form>
     </div>
-    <div class="form-group">
-      <button type="submit" class="btn btn-primary btn-lg pull-right btn-log">Log In</button>
-      <button type="button" class="btn btn-link btn-lg pull-right btn-log">Forgot Password?</button>
-    </div>
-    <input type="hidden" id="csrf_token" name="${_csrf.parameterName}" value="${_csrf.token}" />
-  </form>
+  </div>
+</div>
 </body>
 </html>

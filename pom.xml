@@ -28,8 +28,9 @@
     <spring-cloud-services.version>2.1.0.RELEASE</spring-cloud-services.version>
     <spring-cloud-contract.version>2.1.1.RELEASE</spring-cloud-contract.version>
     <spring.cloud.contract.verifier.jar.skip>true</spring.cloud.contract.verifier.jar.skip>
-    <bootstrap.version>3.3.7-1</bootstrap.version>
-    <jquery.version>2.2.4</jquery.version>
+    <bootstrap.version>4.3.1</bootstrap.version>
+    <jquery.version>3.3.1-2</jquery.version>
+    <webjars-locator.version>0.36</webjars-locator.version>
   </properties>
 
   <dependencies>
@@ -166,7 +167,7 @@
     <dependency>
       <groupId>org.webjars</groupId>
       <artifactId>webjars-locator</artifactId>
-      <version>0.35</version>
+      <version>${webjars-locator.version}</version>
     </dependency>
   </dependencies>
 
