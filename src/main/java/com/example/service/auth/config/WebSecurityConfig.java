@@ -40,27 +40,20 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
   protected void configure(HttpSecurity http) throws Exception {
 
     // @formatter:off
-    // Custom log in page can load /webjars
-    /*
     http
-        .authorizeRequests()
-        .antMatchers(LOGIN, "/oauth/authorize", "/oauth/confirm_access", "/webjars/**", "/icon.png").permitAll()
-        .anyRequest().authenticated()
-        .and()
-        .formLogin().loginPage(LOGIN).permitAll()
+        .requestMatchers()
+            .antMatchers(LOGIN, "/oauth/authorize", "/oauth/confirm_access", "/webjars/**", "/icon.png")
             .and()
-        .logout().permitAll();
-        */
-
-    // Unit tests pass
-    http
-        .requestMatchers().antMatchers(LOGIN, "/oauth/authorize", "/oauth/confirm_access", "/webjars/**", "/icon.png")
-        .and()
-        .logout().permitAll()
-        .and()
-        .authorizeRequests().anyRequest().authenticated()
-        .and()
-        .formLogin().loginPage(LOGIN).permitAll();
+        .authorizeRequests()
+            .antMatchers( "/webjars/**", "/icon.png").permitAll()
+            .anyRequest().authenticated()
+            .and()
+        .formLogin()
+            .loginPage(LOGIN)
+            .permitAll()
+            .and()
+        .logout()
+            .permitAll();
 
     // @formatter:on
   }
