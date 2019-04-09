@@ -1,35 +1,5 @@
 package com.example.service.auth.config;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import com.example.service.auth.domain.Consumer;
-import com.example.service.auth.domain.User;
-import com.example.service.auth.service.AuthClientDetailsService;
-import com.example.service.auth.service.AuthUserDetailsService;
-import io.micrometer.core.annotation.TimedSet;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mockito;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.oauth2.provider.ClientDetails;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-
 import static junit.framework.TestCase.assertNotNull;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
@@ -46,6 +16,33 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import com.example.service.auth.domain.Consumer;
+import com.example.service.auth.domain.User;
+import com.example.service.auth.service.AuthClientDetailsService;
+import com.example.service.auth.service.AuthUserDetailsService;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.oauth2.provider.ClientDetails;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -85,7 +82,7 @@ public class AuthenticationTests {
     consumer.setAccessTokenValiditySeconds(100);
     consumer.setRefreshTokenValiditySeconds(100);
     consumer.setClientId("dummy-client");
-    consumer.setRegisteredRedirectUrisCsv("https://www.medzero.com");
+    consumer.setRegisteredRedirectUrisCsv("https://test.domain.com/context1,https://test.domain.com/context2,https://test.domain.com/context3");
     consumer.setClientSecret(new BCryptPasswordEncoder().encode("password"));
     this.clientDetails = consumer;
 
@@ -141,7 +138,6 @@ public class AuthenticationTests {
     form.set("password", "password");
 
     mockMvc.perform(post("/login")
-        .header("referer", "https://www.medzero.com")
         .params(form).with(csrf()))
         .andDo(MockMvcResultHandlers.print())
         .andExpect(cookie().exists("SESSION"))
@@ -157,6 +153,7 @@ public class AuthenticationTests {
     mockMvc.perform(get("/oauth/authorize")
             .param("client_id", "dummy-client")
             .param("response_type", "code")
+            .param("redirect_uri", "https://test.domain.com/context2")
             .with(user("username")))
             .andExpect(forwardedUrl("/oauth/confirm_access"));
   }
