@@ -42,11 +42,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     // @formatter:off
     http
         .requestMatchers()
-            .antMatchers(LOGIN, "/oauth/authorize", "/oauth/confirm_access", "/webjars/**", "/icon.png")
+            .antMatchers(LOGIN, "/oauth/authorize", "/oauth/confirm_access", "/webjars/**")
             .and()
         .authorizeRequests()
              // Without this line the login page gets 401 error on /webjars/bootstrap js and css (same for "/webjars/**" above)
-            .antMatchers( "/webjars/**", "/icon.png").permitAll()
+            .antMatchers( "/webjars/**").permitAll()
             .anyRequest().authenticated()
             .and()
         .formLogin()
