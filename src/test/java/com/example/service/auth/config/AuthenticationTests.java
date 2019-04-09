@@ -18,9 +18,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.example.service.auth.domain.Consumer;
-import com.example.service.auth.domain.User;
 import com.example.service.auth.service.AuthClientDetailsService;
-import com.example.service.auth.service.AuthUserDetailsService;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.junit.Before;
@@ -33,7 +31,6 @@ import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDoc
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.provider.ClientDetails;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -51,31 +48,15 @@ import org.springframework.util.MultiValueMap;
 public class AuthenticationTests {
 
   @MockBean
-  AuthUserDetailsService authUserDetailsService;
-
-  @MockBean
   AuthClientDetailsService authClientDetailsService;
 
   ClientDetails clientDetails;
-
-  UserDetails userDetails;
 
   @Autowired
   private MockMvc mockMvc;
 
   @Before
   public void before() {
-    User user = new User();
-    user.setPassword(new BCryptPasswordEncoder().encode("password"));
-    user.setActive(true);
-    user.setUsername("username");
-    this.userDetails = user;
-
-    Mockito.when(this.authUserDetailsService.loadUserByUsername("dummy-client"))
-        .thenReturn(userDetails);
-    Mockito.when(this.authUserDetailsService.loadUserByUsername("username"))
-        .thenReturn(userDetails);
-
     Consumer consumer = new Consumer();
     consumer.setScopeCsv("read,write");
     consumer.setAuthorizedGrantTypesCsv("password,refresh_token,authorization_code");
@@ -88,13 +69,6 @@ public class AuthenticationTests {
 
     Mockito.when(this.authClientDetailsService.loadClientByClientId("dummy-client"))
         .thenReturn(clientDetails);
-  }
-
-  @Test
-  public void homePageProtected() throws Exception {
-    mockMvc.perform(get("/"))
-        .andExpect(status().isUnauthorized())
-        .andDo(document("protected"));
   }
 
   @Test
@@ -134,7 +108,7 @@ public class AuthenticationTests {
   @Test
   public void loginSucceeds() throws Exception {
     MultiValueMap<String, String> form = new LinkedMultiValueMap<String, String>();
-    form.set("username", "username");
+    form.set("username", "user");
     form.set("password", "password");
 
     mockMvc.perform(post("/login")
@@ -178,7 +152,7 @@ public class AuthenticationTests {
   @Test
   public void loginFailure() throws Exception {
     MultiValueMap<String, String> form = new LinkedMultiValueMap<String, String>();
-    form.set("username", "username");
+    form.set("username", "user");
     form.set("password", "notpassword");
 
     mockMvc.perform(post("/login")
