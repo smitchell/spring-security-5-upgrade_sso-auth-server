@@ -18,7 +18,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.provider.ClientDetails;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
 
 @RunWith(SpringRunner.class)
@@ -40,8 +39,6 @@ public abstract class RestBase {
   @MockBean
   UserDetails userDetails;
 
-  @Autowired
-  private MockMvc mockMvc;
   @Autowired
   private WebApplicationContext context;
 

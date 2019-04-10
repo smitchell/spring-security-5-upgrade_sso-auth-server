@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>You're In</title>
+  <link rel="stylesheet" type="text/css"
+        href="/css/main.css"/>
+  <link rel="stylesheet" type="text/css"
+        href="webjars/bootstrap/4.3.1/css/bootstrap.min.css"/>
+  <script type="text/javascript"
+          src="webjars/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+</head>
+<body>
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-sm-12 col-md-6 frame logo hidden-sm hidden-xs">
+      <span class="helper"></span>
+      <img src="images/ss-696x392.jpg" alt="Spring logo">
+    </div>
+    <div class="col-sm-12 col-md-6 vertical-center">
+      <form th:action="@{/logout}" th:method="post">
+        <h2 style="margin-bottom: 40px">Welcome <span th:text="${#request.userPrincipal.principal.firstName}"></span></h2>
+        <div class="form-group">
+          <button type="submit" class="btn btn-primary btn-lg pull-right btn-log">Log Out</button>
+        </div>
+        <input type="hidden" id="csrf_token" name="${_csrf.parameterName}" value="${_csrf.token}" />
+      </form>
+    </div>
+  </div>
+</div>
+</body>

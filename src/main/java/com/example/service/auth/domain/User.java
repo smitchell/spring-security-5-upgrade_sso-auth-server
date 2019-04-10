@@ -1,7 +1,6 @@
 package com.example.service.auth.domain;
 
 import java.io.Serializable;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -15,7 +14,6 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
 import lombok.Data;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
@@ -31,11 +29,14 @@ import org.springframework.security.core.userdetails.UserDetails;
 @EntityListeners(AuditingEntityListener.class)
 public class User implements Serializable, UserDetails {
 
-  public static final String UUID_PATTERN = "^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}$";
-
   @Id
-  @Pattern(regexp = UUID_PATTERN)
   private String username;
+
+  @Column
+  private String firstName;
+
+  @Column
+  private String lastName;
 
   @Temporal(TemporalType.TIMESTAMP)
   @CreatedDate
@@ -90,7 +91,7 @@ public class User implements Serializable, UserDetails {
   public Collection<GrantedAuthority> getAuthorities() {
     if (null != roles && !roles.isEmpty()) {
       Set<GrantedAuthority> grantedAuthorityList = new HashSet<>();
-      for (String role : Arrays.asList(roles.split(","))) {
+      for (String role : roles.split(",")) {
         grantedAuthorityList.add(new SimpleGrantedAuthority(role));
       }
       return grantedAuthorityList;

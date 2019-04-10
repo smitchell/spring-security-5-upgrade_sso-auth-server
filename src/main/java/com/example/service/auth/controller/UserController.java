@@ -4,6 +4,7 @@ import com.example.service.auth.domain.User;
 import com.example.service.auth.repository.UserRepository;
 import com.example.service.auth.validation.ValidationRegex;
 import java.util.Optional;
+import javax.annotation.PostConstruct;
 import org.apache.commons.validator.routines.RegexValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +30,26 @@ public class UserController {
       final UserRepository userRepository
   ) {
     this.userRepository = userRepository;
+  }
+
+  @PostConstruct
+  public void postConstruct() {
+    User user = null;
+    Optional<User> optional = userRepository.findById("steve");
+    if (optional.isPresent()) {
+      user = optional.get();
+    } else {
+      // Add a user of testing
+      user = new User();
+      user.setUsername("steve");
+      user.setPassword(new BCryptPasswordEncoder().encode("password"));
+      user.setActive(true);
+      user.setRoles("USER");
+      user.setFirstName("Steve");
+      user.setLastName("Mitchell");
+      user = userRepository.save(user);
+    }
+    Assert.notNull(user, "User \"user\" must not be null");
   }
 
   @RequestMapping(value = "/users/updateUserPassword", method = RequestMethod.POST)

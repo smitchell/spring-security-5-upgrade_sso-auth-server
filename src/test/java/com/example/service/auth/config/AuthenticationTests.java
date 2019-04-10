@@ -91,13 +91,6 @@ public class AuthenticationTests {
   }
 
   @Test
-  public void homePageProtected() throws Exception {
-    mockMvc.perform(get("/"))
-        .andExpect(status().isUnauthorized())
-        .andDo(document("protected"));
-  }
-
-  @Test
   @Ignore
   public void oauthToken() throws Exception {
     MultiValueMap<String, String> params = new LinkedMultiValueMap<>();

@@ -12,9 +12,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.example.service.auth.domain.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -45,7 +45,7 @@ public class UserRepositoryTest {
   @WithMockUser
   public void createUser() throws Exception {
     User user = new User();
-    user.setUsername(UUID.randomUUID().toString());
+    user.setUsername(RandomStringUtils.randomAlphanumeric(10));
     user.setPassword(new BCryptPasswordEncoder().encode("password"));
     user.setActive(true);
 
@@ -65,15 +65,15 @@ public class UserRepositoryTest {
 
     String userId = result.getResponse().getHeader("Location")
         .split("/")[4]; // The part of the location after the 4th slash
-    Assert.assertTrue(userId.matches(User.UUID_PATTERN)); //Make sure {valid-id} matches the pattern
+    Assert.assertEquals(userId, user.getUsername());
+
   }
 
   @Test
   @WithMockUser
-  @Transactional
   public void updateUserPassword() throws Exception {
     User user = new User();
-    user.setUsername(UUID.randomUUID().toString());
+    user.setUsername(RandomStringUtils.randomAlphanumeric(10));
     user.setPassword(new BCryptPasswordEncoder().encode("password"));
 
     String objectString = new ObjectMapper().writeValueAsString(user);
@@ -85,6 +85,7 @@ public class UserRepositoryTest {
         .andExpect(status().isCreated())
         .andReturn();
     String userId = result.getResponse().getHeader("Location").split("/")[4];
+    Assert.assertEquals(userId, user.getUsername());
 
     User updated = new User();
     updated.setUsername(userId);
@@ -105,7 +106,7 @@ public class UserRepositoryTest {
   @Transactional
   public void updateUserPasswordAlt() throws Exception {
     User user = new User();
-    user.setUsername(UUID.randomUUID().toString());
+    user.setUsername(RandomStringUtils.randomAlphanumeric(10));
     user.setPassword(new BCryptPasswordEncoder().encode("origninal"));
 
     String objectString = new ObjectMapper().writeValueAsString(user);
@@ -117,6 +118,7 @@ public class UserRepositoryTest {
         .andExpect(status().isCreated())
         .andReturn();
     String userId = result.getResponse().getHeader("Location").split("/")[4];
+    Assert.assertEquals(userId, user.getUsername());
 
     UpdatePassword updated = new UpdatePassword(
         new BCryptPasswordEncoder().encode("UpdatedPassword"));
@@ -138,7 +140,7 @@ public class UserRepositoryTest {
   @Transactional
   public void updateUserStatus() throws Exception {
     User user = new User();
-    user.setUsername(UUID.randomUUID().toString());
+    user.setUsername(RandomStringUtils.randomAlphanumeric(10));
     user.setPassword(new BCryptPasswordEncoder().encode("password"));
     user.setActive(Boolean.TRUE);
 
@@ -151,6 +153,7 @@ public class UserRepositoryTest {
         .andExpect(status().isCreated())
         .andReturn();
     String userId = result.getResponse().getHeader("Location").split("/")[4];
+    Assert.assertEquals(userId, user.getUsername());
 
     UpdateStatus updateStatus = new UpdateStatus(Boolean.FALSE);
 

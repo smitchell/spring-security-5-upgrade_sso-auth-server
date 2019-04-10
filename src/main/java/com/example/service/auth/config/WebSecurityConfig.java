@@ -7,6 +7,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
@@ -16,6 +17,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 @Order(-20)
 @Configuration
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+
   private static final String LOGIN = "/login";
 
   private final AuthUserDetailsService authUserDetailsService;
@@ -37,16 +39,23 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
   }
 
   @Override
+  public void configure(WebSecurity web) throws Exception {
+    web.ignoring().antMatchers(
+        "/webjars/**",
+        "/css/**",
+        "/images/**",
+        "/favicon.ico");
+  }
+
+  @Override
   protected void configure(HttpSecurity http) throws Exception {
 
     // @formatter:off
-    http
-        .requestMatchers()
-            .antMatchers(LOGIN, "/oauth/authorize", "/oauth/confirm_access", "/webjars/**")
+
+    http.requestMatchers()
+            .antMatchers( "/", "/login**", "/oauth/authorize", "/oauth/confirm_access")
             .and()
         .authorizeRequests()
-             // Without this line the login page gets 401 error on /webjars/bootstrap js and css (same for "/webjars/**" above)
-            .antMatchers( "/webjars/**").permitAll()
             .anyRequest().authenticated()
             .and()
         .formLogin()
