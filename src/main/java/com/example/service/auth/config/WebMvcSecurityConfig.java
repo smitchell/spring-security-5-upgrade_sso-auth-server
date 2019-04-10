@@ -21,6 +21,7 @@ public class WebMvcSecurityConfig implements WebMvcConfigurer {
   public void addViewControllers(ViewControllerRegistry registry) {
     registry.addViewController("/").setViewName("protected");
     registry.addViewController(LOGIN).setViewName("login");
+    registry.addViewController("/").setViewName("protected");
     registry.addViewController("/oauth/confirm_access").setViewName("authorize");
   }
 

@@ -16,19 +16,27 @@
 package com.example.service.auth.config;
 
 import com.example.service.auth.service.AuthClientDetailsService;
+import com.example.service.auth.service.AuthUserDetailsService;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
-import org.springframework.security.provisioning.UserDetailsManager;
+import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
+import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
+import org.springframework.security.oauth2.provider.token.TokenStore;
+import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
+import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
+import org.springframework.web.servlet.view.RedirectView;
 
 /**
  * An instance of Legacy Authorization Server (spring-security-oauth2) that uses a single,
@@ -47,30 +55,85 @@ import org.springframework.security.provisioning.UserDetailsManager;
 @Configuration
 public class AuthServerConfig extends AuthorizationServerConfigurerAdapter {
 
+  private final String privateKey;
+
+  private final String publicKey;
+
   private final AuthClientDetailsService authClientDetailsService;
+
+  private final AuthenticationManager authenticationManager;
+
+  private final AuthUserDetailsService authUserDetailsService;
 
   @Autowired
   public AuthServerConfig(
+      @Value("${keyPair.privateKey}") final String privateKey,
+      @Value("${keyPair.publicKey}") final String publicKey,
       final AuthClientDetailsService authClientDetailsService,
+      final AuthUserDetailsService authUserDetailsService,
       final AuthenticationConfiguration authenticationConfiguration) throws Exception {
+    this.privateKey = privateKey;
+    this.publicKey = publicKey;
     this.authClientDetailsService = authClientDetailsService;
+    this.authUserDetailsService = authUserDetailsService;
+    this.authenticationManager = authenticationConfiguration.getAuthenticationManager();
   }
 
-  @Bean
-  UserDetailsService memory() {
-    return new InMemoryUserDetailsManager();
-  }
-  @Bean
-  InitializingBean initializing(UserDetailsManager manager) {
-    return () -> {
-      UserDetails josh = User.withDefaultPasswordEncoder().username("user").password("password").roles("USER").build();
-      manager.createUser(josh);
-    };
+  @Override
+  public void configure(
+      AuthorizationServerSecurityConfigurer oauthServer) throws Exception {
+    oauthServer.tokenKeyAccess("permitAll()")
+        .checkTokenAccess("isAuthenticated()");
   }
 
   @Override
   public void configure(final ClientDetailsServiceConfigurer clients) throws Exception {
     clients.withClientDetails(authClientDetailsService);
+  }
+
+  @Override
+  public void configure(final AuthorizationServerEndpointsConfigurer endpoints) {
+    endpoints
+        .authenticationManager(authenticationManager)
+        .accessTokenConverter(accessTokenConverter())
+        .userDetailsService(authUserDetailsService)
+        .tokenStore(tokenStore());
+
+
+    //Invalidate the session once the user has been authenticated
+    endpoints.addInterceptor(new HandlerInterceptorAdapter() {
+      @Override
+      public void postHandle(HttpServletRequest request,
+          HttpServletResponse response, Object handler,
+          ModelAndView modelAndView) throws Exception {
+        if (modelAndView != null
+            && modelAndView.getView() instanceof RedirectView) {
+          RedirectView redirect = (RedirectView) modelAndView.getView();
+          String url = redirect.getUrl();
+          if (url == null || url.contains("code=") || url.contains("error=")) {
+            HttpSession session = request.getSession(false);
+            if (session != null) {
+              log.info("Invalidating the authentication session");
+              session.invalidate();
+            }
+          }
+        }
+      }
+    });
+  }
+
+	@Bean
+	public TokenStore tokenStore() {
+		return new JwtTokenStore(accessTokenConverter());
+	}
+
+
+  @Bean
+  public JwtAccessTokenConverter accessTokenConverter() {
+    final JwtAccessTokenConverter converter = new JwtAccessTokenConverter();
+    converter.setSigningKey(privateKey);
+    converter.setVerifierKey(publicKey);
+    return converter;
   }
 
 }
