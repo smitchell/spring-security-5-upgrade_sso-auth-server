@@ -1,60 +1,22 @@
 spring:
   application:
-    name: auth-service
+    name: auth-example
   datasource:
     url: jdbc:h2:mem:testdb;DB_CLOSE_ON_EXIT=FALSE;DB_CLOSE_DELAY=-1
+  cloud:
+    config:
+      override-none: true
   main:
     banner-mode: 'off'
-  thymeleaf:
-    cache: false
-
-keyPair:
-  # I generated this just for this example project
-  # openssl genrsa -out jwt.pem 2048
-  # openssl rsa -in jwt.pem
-  privateKey: |
-    -----BEGIN RSA PRIVATE KEY-----
-    MIIEpAIBAAKCAQEAzxi/2o2/xbs9UkLhL5CwsU9MjUh7RQyHWuXl1bbFSVg/12Qf
-    w5uGtqk2uSyiA8ND+/Ig3C98sbM4e5lQs6P9eeTPv05lYalaX9qZ81Y1y55jIa+t
-    Yg4Vylus1F52rDNMsX+ZCliK9KzL09N8qbh1D2obNQZF6bp5r25B7zoWgrM5wORP
-    02MBWkjFbJ9+pacarikcyUll03C6vGj48X59wuqZjNBOIL+uM/adqjs3jwEpR3xA
-    JUlclWaV8ogp4d56myL4ElgTPW3nKejFaV7cdy2/66+kYg1un2mTTwx6KJKL+T2D
-    tpGW4imunC6mT/RxbJa4Ys2w/P3pyBViNijoIwIDAQABAoIBAQDB0+4shaLJU/eO
-    uF2+gPN+4DNLwFzvQUyl/KniHlAD137Y/zLjhvrMlw9KvMVeNDG66uFqc1+HibAB
-    rnrjx0aEAW2XJa6pezHEqPqRz0xGKRWq/5uNPJWUcb0OfuMfRFwxfLUmA7z6R4f1
-    1+jDiIq3RJ32QMrKeOdPFCjN2FYdOCYdLdNnLSNj73KCmV4bwyN2I6+OgQBZi1xM
-    /gJ8Aonfr/8Xid0WQcJnt1bKYKeeJ2CZOAupsKpf/6EiU8bwsCwkV9wNSNuOeV2A
-    77BfKQa6gTtjfJsC/BrBYVDXnLjDf/+ziKcR1pdxoFOuyzwcBr38C4qUCEhHm+9J
-    nRrpnylBAoGBAPBHZiaIFdCz0wuSnWrP7lKJWUtEE6Pmf/GAE1WzC8LEYqgVsYZH
-    pJS47jtItW6hL75Il7OU+2vWzv1C+BYyauEEq3zHf+gC7CVt6jM71gJp7RVAvwGK
-    U168F7lz1Mo/Y4epUA1npyJ1ycEGmxkjMnpR8bPyaUSTmE8saX/Q62TzAoGBANyl
-    jtHi83a2Sn54MBnXEZ/L5qyf/ml+Pcf9j/YwnNNoqoW65TuF31sd4zQsDYTBDEMz
-    vpc5Yj+0xp6pnaTmRXHi6Qj/cuON0x3vqJboPRwdB2nqYxLyeZKfsuciAOco9hvp
-    Y6OfhInf7QPiH+fcnv+yynOvDzSpSQ+nf2zOOPwRAoGAVcMmUtp/7t5AlgDe7yEI
-    j602kgbae8XqJOjx/cTKjdpK3HPhyWwI8oyPe9mX6MTfpauDejXTB8rEVuFwa3vT
-    aj2geAk9PjLM1w9EaMUSvgnQ9aUGiCY3W7kHPsp5STcW73UffalhnossWBljgrVt
-    bvuQqgn8SN3ln1zayyRm4MECgYA0wckyWieIfPG255nos8ndAW34XJECPFMdXH1t
-    ihYVXnNXYmapIstTCARpVxcsZNQ/xUGO+wOI4/qRuVCeOwjjwDOkGSApVKHkCIew
-    /XqPHEnHg2mJAD0dV9348eJxYxPlfJp8ZwnTxZzwTsL+N3w0+1T48CScnNWBTrVj
-    GLP7YQKBgQC5RcrlYK03kMeBr9IZ5F1sT8kxdpHTYcVVYkA3ly3UpC3B0zkl8ydf
-    lYdAfm7XSOAtdM0660YQfBhfzPhJ8wv5GzdxylasjDGswVo+JD7ZSReK/bdnIBAw
-    bKwjHqMs3Uzs73OWZGmkDYtDXclo9cxRxDRLfetrN1qLajTGBBstww==
-    -----END RSA PRIVATE KEY-----
-  # I generated this just for this example project
-  # openssl rsa -in jwt.pem -pubout
-  publicKey: |
-    -----BEGIN PUBLIC KEY-----
-    MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzxi/2o2/xbs9UkLhL5Cw
-    sU9MjUh7RQyHWuXl1bbFSVg/12Qfw5uGtqk2uSyiA8ND+/Ig3C98sbM4e5lQs6P9
-    eeTPv05lYalaX9qZ81Y1y55jIa+tYg4Vylus1F52rDNMsX+ZCliK9KzL09N8qbh1
-    D2obNQZF6bp5r25B7zoWgrM5wORP02MBWkjFbJ9+pacarikcyUll03C6vGj48X59
-    wuqZjNBOIL+uM/adqjs3jwEpR3xAJUlclWaV8ogp4d56myL4ElgTPW3nKejFaV7c
-    dy2/66+kYg1un2mTTwx6KJKL+T2DtpGW4imunC6mT/RxbJa4Ys2w/P3pyBViNijo
-    IwIDAQAB
-    -----END PUBLIC KEY-----
-
-security:
-  oauth2:
-    client:
-      client-id: auth-service
-      client-secret: auth-service-secret
+  output:
+    ansi:
+      enabled: ALWAYS
+  jpa:
+    generate-ddl: true
+    hibernate:
+      ddl-auto: create
+    open-in-view: false
+  profiles:
+    active: test
+  session:
+    store-type: jdbc

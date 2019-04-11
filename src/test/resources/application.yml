@@ -42,16 +42,37 @@ keyPair:
     IwIDAQAB
     -----END PUBLIC KEY-----
 
+logging:
+  level:
+    com.medzero.service.auth.Application: INFO
+    com.medzero.service.auth.service: INFO
+    com.medzero.service.auth.controller: INFO
+    org.springframework.security.oauth2: DEBUG
+    org.springframework.security.config: DEBUG
+    org.springframework.security: DEBUG
+    org.springframework.security.oauth: DEBUG
+    org.springframework.security.oauth.boot: DEBUG
+
 security:
   oauth2:
     client:
-      client-id: auth-service
-      client-secret: auth-service-secret
+      client-id: auth-example
+      client-secret: auth-example-secret
 
 server:
   port: 0
 
 spring:
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_ON_EXIT=FALSE;DB_CLOSE_DELAY=-1
+  cloud:
+    config:
+      override-none: true
+  main:
+    banner-mode: 'off'
+  output:
+    ansi:
+      enabled: ALWAYS
   jpa:
     generate-ddl: true
     hibernate:

@@ -1,34 +1,37 @@
-# SPRING SECURITY 5.X AUTHORIZATION SERVER UPGRADE TROUBLESHOOTING
+# SPRING SECURITY REFERENCE IMPLEMENTATION
 
-The purpose of this repository is to troubleshoot problems encountered upgrading our authorization server from Spring Boot 1.5.13.RELEASE to 2.1.3.RELEASE.
+This project is my reference implementation of Spring Security 5. It is a simplified version of my production project that I can share.
 
 ## Summary
 
-After upgrading an existing authentication server to Spring Boot 2, the shared custom login page in the authentication service no longer redirects the user back to the original protected URI.
-Actual Behavior
+This project can be run in any of the following ways.
 
-1) The user attempts to access a protected, proxied web resource.
-2) The user is redirected to the shared, custom login page in the authentication service.
-3) The user posts her credentials.
-4) Instead of being redirected back to the original website, the error below displays on the page.
+1) **JUnit tests** - Feel free to create a pull request with new test ideas.
+2) **Run Application.java** - For basic authentication tests you can run the project in your IDE at http://localhost:8080.
+3) **PCF DEV** - Deploy to pcf dev to do integration tests with the sister Zuul Proxy project (coming soon).
+
+### Running this Project on PCF DEV
+
+Start pcf dev and sign in. Login with "user" and "pass".
+```
+cf dev start
+cf login -a https://api.local.pcfdev.io --skip-ssl-validation
+```
+Change your terminal path to the project folder, built it, and push it to pcf dev.
 
 ```
-OAuth Error
-error="invalid_request", error_description="At least one redirect_uri must be registered with the client."
+cd [path-to-project]/spring-security-5-upgrade_sso-auth-server
+mvn clean install
+cf push -f manifest.yml -p target/auth-0.0.1-SNAPSHOT.jar
 ```
 
-## Expected Behavior
+Use the PCF Console to tail the logs
+1) Open your browser to https://apps.local.pcfdev.io/. Sign in with "user" "pass".
+2) Navigate to the pcfdev-space. The auth-example should be running with a route of http://auth-example.local.pcfdev.io/
+3) Click the "auth-example" hyperlink to open the app settings.
+4) Select the Logs tab.
 
-Upon successful authentication, the browser should be redirected back to the original website.
-Configuration
-
-I scoured our production authentication service for configuration settings specific to the redirect URI but found none. We use a custom ClientDetails object, and its getRegisteredRedirectUri() method always returns an empty Set. Despite that, users get redirected to the original URI after Login. That is no longer the case after upgrading to Spring Boot 2.
-
-I have not been able to recreate the "At least one redirect_uri must be registered with the client." error with a unit test. I would like to be able to do that so I could set a breakpoint and step through what is happening.
-
-## Version
-
-The working production code is running 1.5.13.RELEASE. The updated code is running 2.1.3.RELEASE
-
-## Spring Security Issue:
-https://github.com/spring-projects/spring-security/issues/6758
+Open the application in your browser
+1) Goto http://auth-example.local.pcfdev.io
+2) Sign in as "steve" "password".
+3) Click the logout button.

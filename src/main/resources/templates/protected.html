@@ -15,11 +15,13 @@
   <div class="row">
     <div class="col-sm-12 col-md-6 frame logo hidden-sm hidden-xs">
       <span class="helper"></span>
-      <img src="images/ss-696x392.jpg" alt="Spring logo">
+      <img src="images/logo.jpg" alt="Spring logo">
     </div>
     <div class="col-sm-12 col-md-6 vertical-center">
       <form th:action="@{/logout}" th:method="post">
         <h2 style="margin-bottom: 40px">Welcome <span th:text="${#request.userPrincipal.principal.firstName}"></span></h2>
+        <p>View the source code for this project on
+          <a href="https://github.com/smitchell/spring-security-5-upgrade_sso-auth-server" target="_blank">Github</a>.</p>
         <div class="form-group">
           <button type="submit" class="btn btn-primary btn-lg pull-right btn-log">Log Out</button>
         </div>
