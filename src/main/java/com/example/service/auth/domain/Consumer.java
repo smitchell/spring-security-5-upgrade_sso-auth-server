@@ -26,6 +26,12 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.provider.ClientDetails;
 
+/**
+ * This is a simplified ClientDetails implementation. There is one record for each micro-service needing to use
+ * oauth2 credentials to access another service. For example, a RabbitMQ consumer does not have end-user credentials
+ * when it runs, so if it needs to call the report-service it uses its client id and client secret to authenticate.
+ * To simplify the model, there are several comma delimited properties that get split as needed.
+ */
 @Entity
 @Data
 @EntityListeners(AuditingEntityListener.class)

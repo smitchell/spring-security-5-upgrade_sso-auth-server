@@ -51,37 +51,19 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
   protected void configure(HttpSecurity http) throws Exception {
 
     // @formatter:off
-
-//    http.requestMatchers()
-//            .antMatchers( "/", "/login**", "/oauth/authorize", "/oauth/confirm_access", "/users**")
-//            .and()
-//        .authorizeRequests()
-//            .anyRequest().authenticated()
-//            .and()
-//        .formLogin()
-//            .loginPage(LOGIN)
-//            .permitAll()
-//            .and()
-//        .logout()
-//            .permitAll();
-
     http
         .requestMatchers()
-        .antMatchers("/", LOGIN, "/oauth/authorize", "/oauth/confirm_access", "/webjars/**", "/icon.png")
-        .and()
+            .antMatchers("/", LOGIN, "/oauth/authorize", "/oauth/confirm_access")
+            .and()
         .authorizeRequests()
-        // Without this line the login page gets 401 error on /webjars/bootstrap js and css (same for "/webjars/**" above)
-        .antMatchers( "/webjars/**", "/icon.png").permitAll()
-        .anyRequest().authenticated()
-        .and()
+            .anyRequest().authenticated()
+            .and()
         .formLogin()
-        .loginPage(LOGIN)
-        .permitAll()
-        .and()
+            .loginPage(LOGIN)
+            .permitAll()
+            .and()
         .logout()
-        .permitAll();
-
-
+            .permitAll();
     // @formatter:on
   }
 
