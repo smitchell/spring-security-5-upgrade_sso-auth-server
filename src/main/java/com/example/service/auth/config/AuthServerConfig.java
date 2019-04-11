@@ -122,10 +122,10 @@ public class AuthServerConfig extends AuthorizationServerConfigurerAdapter {
     });
   }
 
-	@Bean
-	public TokenStore tokenStore() {
-		return new JwtTokenStore(accessTokenConverter());
-	}
+  @Bean
+  public TokenStore tokenStore() {
+    return new JwtTokenStore(accessTokenConverter());
+  }
 
 
   @Bean

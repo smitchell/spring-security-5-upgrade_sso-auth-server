@@ -108,7 +108,7 @@ public class AuthenticationTests {
   @Test
   public void loginSucceeds() throws Exception {
     MultiValueMap<String, String> form = new LinkedMultiValueMap<String, String>();
-    form.set("username", "user");
+    form.set("username", "steve");
     form.set("password", "password");
 
     mockMvc.perform(post("/login")
@@ -152,7 +152,7 @@ public class AuthenticationTests {
   @Test
   public void loginFailure() throws Exception {
     MultiValueMap<String, String> form = new LinkedMultiValueMap<String, String>();
-    form.set("username", "user");
+    form.set("username", "steve");
     form.set("password", "notpassword");
 
     mockMvc.perform(post("/login")

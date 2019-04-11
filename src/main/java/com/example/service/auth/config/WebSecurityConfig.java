@@ -19,13 +19,13 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
   private static final String LOGIN = "/login";
-
   private final AuthUserDetailsService authUserDetailsService;
-
   private final AuthenticationConfiguration authenticationConfiguration;
 
   @Autowired
-  public WebSecurityConfig(final AuthenticationConfiguration authenticationConfiguration, final AuthUserDetailsService authUserDetailsService) {
+  public WebSecurityConfig(
+      final AuthUserDetailsService authUserDetailsService,
+      final AuthenticationConfiguration authenticationConfiguration) {
     this.authenticationConfiguration = authenticationConfiguration;
     this.authUserDetailsService = authUserDetailsService;
   }
@@ -52,18 +52,35 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     // @formatter:off
 
-    http.requestMatchers()
-            .antMatchers( "/", "/login**", "/oauth/authorize", "/oauth/confirm_access")
-            .and()
+//    http.requestMatchers()
+//            .antMatchers( "/", "/login**", "/oauth/authorize", "/oauth/confirm_access", "/users**")
+//            .and()
+//        .authorizeRequests()
+//            .anyRequest().authenticated()
+//            .and()
+//        .formLogin()
+//            .loginPage(LOGIN)
+//            .permitAll()
+//            .and()
+//        .logout()
+//            .permitAll();
+
+    http
+        .requestMatchers()
+        .antMatchers("/", LOGIN, "/oauth/authorize", "/oauth/confirm_access", "/webjars/**", "/icon.png")
+        .and()
         .authorizeRequests()
-            .anyRequest().authenticated()
-            .and()
+        // Without this line the login page gets 401 error on /webjars/bootstrap js and css (same for "/webjars/**" above)
+        .antMatchers( "/webjars/**", "/icon.png").permitAll()
+        .anyRequest().authenticated()
+        .and()
         .formLogin()
-            .loginPage(LOGIN)
-            .permitAll()
-            .and()
+        .loginPage(LOGIN)
+        .permitAll()
+        .and()
         .logout()
-            .permitAll();
+        .permitAll();
+
 
     // @formatter:on
   }
