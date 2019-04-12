@@ -1,3 +1,7 @@
+example:
+  auth-url: http://auth-example.local.pcfdev.io
+  proxy-url: http://zuul-proxy-example.local.pcfdev.io
+
 info:
   build:
     version: @project.version@
@@ -61,4 +65,4 @@ security:
   oauth2:
     client:
       client-id: auth-example
-      client-secret: auth-example-secret
+      client-secret: password

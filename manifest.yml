@@ -3,5 +3,5 @@ applications:
   - buildpack: https://github.com/cloudfoundry/java-buildpack.git
     name: auth-example
     memory: 768m
-    path: ../target/auth-service-0-SNAPSHOT.jar
+    path: target/auth-0.0.1-SNAPSHOT.jar
     timeout: 180

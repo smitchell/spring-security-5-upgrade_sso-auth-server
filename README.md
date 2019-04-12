@@ -17,16 +17,17 @@ Start pcf dev and sign in. Login with "user" and "pass".
 cf dev start
 cf login -a https://api.local.pcfdev.io --skip-ssl-validation
 ```
-Change your terminal path to the project folder, built it, and push it to pcf dev.
+Clone the project, change to the project directory, built it, and push it to pcf dev.
 
 ```
+git clone https://github.com/smitchell/spring-security-5-upgrade_sso-auth-server.git
 cd [path-to-project]/spring-security-5-upgrade_sso-auth-server
 mvn clean install
-cf push -f manifest.yml -p target/auth-0.0.1-SNAPSHOT.jar
+cf push
 ```
 
 Use the PCF Console to tail the logs
-1) Open your browser to https://apps.local.pcfdev.io/. Sign in with "user" "pass".
+1) Open your local https://apps.local.pcfdev.io/. Sign in with "user" "pass".
 2) Navigate to the pcfdev-space. The auth-example should be running with a route of http://auth-example.local.pcfdev.io/
 3) Click the "auth-example" hyperlink to open the app settings.
 4) Select the Logs tab.
