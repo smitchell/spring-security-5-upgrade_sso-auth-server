@@ -26,20 +26,24 @@ public class AuthClientDetailsService implements ClientDetailsService {
   }
 
   /**
-   * This is a quick and dirty convience method to set-up the app for the proxy integration test.
+   * This is a quick and dirty convenience method to set-up the app for the proxy integration test.
    * @return
    */
   private String generateRegisteredRedirectUrisCsv() {
+    final String HTTP = "http://";
+    final String HTTPS = "https://";
     StringBuilder sb = new StringBuilder();
     for (String value : new String[]{"/", "/login", "/angular-example"}) {
-      sb.append(authServiceUrl);
-      sb.append(value);
-      sb.append(",");
-      sb.append(proxyServiceUrl);
-      sb.append(value);
-      sb.append(",");
+      sb.append(generateRegisteredRedirectUri(HTTP, authServiceUrl, value));
+      sb.append(generateRegisteredRedirectUri(HTTPS, authServiceUrl, value));
+      sb.append(generateRegisteredRedirectUri(HTTP, proxyServiceUrl, value));
+      sb.append(generateRegisteredRedirectUri(HTTPS, proxyServiceUrl, value));
     }
     return sb.toString().substring(0, sb.toString().length() - 1);
+  }
+
+  private String generateRegisteredRedirectUri(String protocol, String baseUrl, String context) {
+    return protocol.concat(baseUrl).concat(context).concat(",") ;
   }
 
   @Override
