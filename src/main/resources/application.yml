@@ -1,7 +1,32 @@
 # Used in AuthClientDetailsService.generateRegisteredRedirectUrisCsv()
+# UPDATE THESE ROUTES WITH ROUTES FROM YOUR TEST ENVIRONMENT
 example:
   auth-url: auth-example.test.medzero.cfapps.io
   proxy-url: zuul-proxy-example.test.medzero.cfapps.io
+
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_ON_EXIT=FALSE;DB_CLOSE_DELAY=-1
+  main:
+    banner-mode: 'off'
+  output:
+    ansi:
+      enabled: ALWAYS
+  jpa:
+    generate-ddl: true
+    hibernate:
+      ddl-auto: create
+    open-in-view: false
+  profiles:
+    active: test
+  session:
+    store-type: jdbc
+  cloud:
+    services:
+      registrationMethod: direct
+    cloudfoundry:
+      username: '**********'
+      password: '**********'
 
 info:
   build:
