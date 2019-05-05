@@ -3,6 +3,8 @@
 example:
   auth-url: auth-example.test.medzero.cfapps.io
   proxy-url: zuul-proxy-example.test.medzero.cfapps.io
+#  auth-url: http://auth-example.local.pcfdev.io
+#  proxy-url: http://zuul-proxy-example.local.pcfdev.io
 
 eureka:
   client:

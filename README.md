@@ -17,11 +17,21 @@ Start pcf dev and sign in. Login with "user" and "pass".
 cf dev start
 cf login -a https://api.local.pcfdev.io --skip-ssl-validation
 ```
-Clone the project, change to the project directory, built it, and push it to pcf dev.
-
+Clone the project and switch to the project directory:
 ```
 git clone https://github.com/smitchell/spring-security-5-upgrade_sso-auth-server.git
 cd [path-to-project]/spring-security-5-upgrade_sso-auth-server
+```
+
+Edit /src/main/resource/application.yml and make sure the URLS are set for pcf dev:
+```
+example:
+  auth-url: http://auth-example.local.pcfdev.io
+  proxy-url: http://zuul-proxy-example.local.pcfdev.io
+```
+
+Build the project and push it to pcfdev.
+```
 mvn clean install
 cf push
 ```
