@@ -6,15 +6,6 @@ example:
 #  auth-url: http://auth-example.local.pcfdev.io
 #  proxy-url: http://zuul-proxy-example.local.pcfdev.io
 
-eureka:
-  client:
-    fetchRegistry: true
-    healthcheck:
-      enabled: true
-    registerWithEureka: true
-    service-url:
-      defaultZone: https://eureka-6e9cd6de-58b7-4b08-a10e-5e176a7a7cea.cfapps.io/eureka/
-
 management:
   cloudfoundry:
     skip-ssl-validation: true
