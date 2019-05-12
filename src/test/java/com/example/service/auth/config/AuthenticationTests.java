@@ -1,5 +1,7 @@
 package com.example.service.auth.config;
 
+import static com.example.service.auth.constants.SecurityConstants.OAUTH_AUTHORIZE_URL;
+import static com.example.service.auth.constants.SecurityConstants.OAUTH_TOKEN_URL;
 import static junit.framework.TestCase.assertNotNull;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
@@ -22,7 +24,6 @@ import com.example.service.auth.service.AuthClientDetailsService;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -72,16 +73,15 @@ public class AuthenticationTests {
   }
 
   @Test
-  @Ignore
   public void oauthToken() throws Exception {
     MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
     params.add("grant_type", "password");
     params.add("client_id", "dummy-client");
     params.add("client_secret", "password");
-    params.add("username", "username");
+    params.add("username", "steve");
     params.add("password", "password");
 
-    MvcResult result = mockMvc.perform(post("/oauth/token")
+    MvcResult result = mockMvc.perform(post(OAUTH_TOKEN_URL)
         .with(httpBasic("dummy-client", "password"))
         .params(params))
         .andExpect(status().is2xxSuccessful())
@@ -98,7 +98,7 @@ public class AuthenticationTests {
 
   @Test
   public void authorizationRedirects() throws Exception {
-    MvcResult result = mockMvc.perform(get("/oauth/authorize"))
+    MvcResult result = mockMvc.perform(get(OAUTH_AUTHORIZE_URL))
         .andExpect(status().isFound())
         .andExpect(header().string("Location", "http://localhost:8080/login"))
         .andDo(document("authorize"))
@@ -114,7 +114,6 @@ public class AuthenticationTests {
     mockMvc.perform(post("/login")
         .params(form).with(csrf()))
         .andDo(MockMvcResultHandlers.print())
-        .andExpect(cookie().exists("SESSION"))
         .andExpect(status().isFound())
         .andExpect(redirectedUrl("/"))
         .andDo(document("login-submit"))

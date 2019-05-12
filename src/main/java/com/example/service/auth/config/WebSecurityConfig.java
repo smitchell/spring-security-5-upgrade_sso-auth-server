@@ -1,7 +1,14 @@
 package com.example.service.auth.config;
 
+import static com.example.service.auth.constants.SecurityConstants.LOGIN;
+import static com.example.service.auth.constants.SecurityConstants.OAUTH_AUTHORIZE_URL;
+import static com.example.service.auth.constants.SecurityConstants.OAUTH_CONFIRM_ACCESS_URL;
+
+import com.example.service.auth.filter.JwtAuthenticationFilter;
+import com.example.service.auth.filter.JwtAuthorizationFilter;
 import com.example.service.auth.service.AuthUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -9,7 +16,9 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 /**
  * For configuring the end users recognized by this Authorization Server
@@ -18,7 +27,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 @Configuration
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-  private static final String LOGIN = "/login";
   private final AuthUserDetailsService authUserDetailsService;
   private final AuthenticationConfiguration authenticationConfiguration;
 
@@ -35,7 +43,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     auth
         .parentAuthenticationManager(authenticationConfiguration.getAuthenticationManager())
         .userDetailsService(authUserDetailsService)
-        .passwordEncoder(new BCryptPasswordEncoder());
+        .passwordEncoder(passwordEncoder());
+  }
+
+  @Bean
+  public PasswordEncoder passwordEncoder() {
+    return new BCryptPasswordEncoder();
   }
 
   @Override
@@ -53,7 +66,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     // @formatter:off
     http
         .requestMatchers()
-            .antMatchers("/", LOGIN, "/oauth/authorize", "/oauth/confirm_access")
+            .antMatchers("/", LOGIN, OAUTH_AUTHORIZE_URL, OAUTH_CONFIRM_ACCESS_URL)
             .and()
         .authorizeRequests()
             .anyRequest().authenticated()
@@ -63,7 +76,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             .permitAll()
             .and()
         .logout()
-            .permitAll();
+            .permitAll()
+        .and()
+            .addFilter(new JwtAuthenticationFilter(authenticationManager()))
+            .addFilter(new JwtAuthorizationFilter(authenticationManager()))
+        .sessionManagement()
+            .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     // @formatter:on
   }
 

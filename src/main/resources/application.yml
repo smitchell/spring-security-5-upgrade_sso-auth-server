@@ -33,14 +33,17 @@ info:
     version: @project.version@
 logging:
   level:
-    com.medzero.service.auth.Application: INFO
-    com.medzero.service.auth.service: INFO
-    com.medzero.service.auth.controller: INFO
+    com.example.service.auth.Application: INFO
+    com.example.service.auth.service: INFO
+    com.example.service.auth.controller: INFO
+    com.example.service.auth.filter: DEBUG
     org.springframework.security.oauth2: DEBUG
     org.springframework.security.config: DEBUG
     org.springframework.security: DEBUG
     org.springframework.security.oauth: DEBUG
     org.springframework.security.oauth.boot: DEBUG
+
+
 
 keyPair:
   # I generated this just for this example project
