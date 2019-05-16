@@ -26,8 +26,11 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 @Slf4j
 public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
-  public JwtAuthorizationFilter(AuthenticationManager authenticationManager) {
+  private final String privateKey;
+
+  public JwtAuthorizationFilter(final String privateKey, AuthenticationManager authenticationManager) {
     super(authenticationManager);
+    this.privateKey = privateKey;
   }
 
   @Override
@@ -51,7 +54,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
     var token = request.getHeader(SecurityConstants.TOKEN_HEADER);
     if (StringUtils.isNotEmpty(token)) {
       try {
-        var signingKey = SecurityConstants.JWT_SECRET.getBytes();
+        var signingKey = privateKey.getBytes();
 
         var parsedToken = Jwts.parser()
             .setSigningKey(signingKey)
@@ -62,7 +65,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
             .getSubject();
 
         var authorities = ((List<?>) parsedToken.getBody()
-            .get("rol")).stream()
+            .get("roles")).stream()
             .map(authority -> new SimpleGrantedAuthority((String) authority))
             .collect(Collectors.toList());
 

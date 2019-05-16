@@ -23,10 +23,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
   private final AuthenticationManager authenticationManager;
+  private final String privateKey;
 
-  public JwtAuthenticationFilter(AuthenticationManager authenticationManager) {
+  public JwtAuthenticationFilter(final String privateKey, AuthenticationManager authenticationManager) {
     this.authenticationManager = authenticationManager;
-
+    this.privateKey = privateKey;
     setFilterProcessesUrl(SecurityConstants.AUTH_LOGIN_URL);
   }
 
@@ -52,16 +53,16 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         .map(GrantedAuthority::getAuthority)
         .collect(Collectors.toList());
 
-    var signingKey = SecurityConstants.JWT_SECRET.getBytes();
+    var signingKey = privateKey.getBytes();
 
     var token = Jwts.builder()
-        .signWith(Keys.hmacShaKeyFor(signingKey), SignatureAlgorithm.HS512)
+        .signWith(Keys.hmacShaKeyFor(signingKey), SignatureAlgorithm.NONE)
         .setHeaderParam("typ", SecurityConstants.TOKEN_TYPE)
         .setIssuer(SecurityConstants.TOKEN_ISSUER)
         .setAudience(SecurityConstants.TOKEN_AUDIENCE)
         .setSubject(user.getUsername())
         .setExpiration(new Date(System.currentTimeMillis() + 864000000))
-        .claim("rol", roles)
+        .claim("roles", roles)
         .compact();
     log.debug("successfulAuthentication ---> " + token);
 

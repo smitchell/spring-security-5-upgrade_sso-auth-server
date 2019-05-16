@@ -8,6 +8,7 @@ import com.example.service.auth.filter.JwtAuthenticationFilter;
 import com.example.service.auth.filter.JwtAuthorizationFilter;
 import com.example.service.auth.service.AuthUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -28,11 +29,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
   private final AuthUserDetailsService authUserDetailsService;
   private final AuthenticationConfiguration authenticationConfiguration;
+  private final String privateKey;
 
   @Autowired
   public WebSecurityConfig(
+      @Value("${keyPair.privateKey}") final String privateKey,
       final AuthUserDetailsService authUserDetailsService,
       final AuthenticationConfiguration authenticationConfiguration) {
+    this.privateKey = privateKey;
     this.authenticationConfiguration = authenticationConfiguration;
     this.authUserDetailsService = authUserDetailsService;
   }
@@ -77,8 +81,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         .logout()
             .permitAll()
         .and()
-            .addFilter(new JwtAuthenticationFilter(authenticationManager()))
-            .addFilter(new JwtAuthorizationFilter(authenticationManager()));
+            .addFilter(new JwtAuthenticationFilter(privateKey, authenticationManager()))
+            .addFilter(new JwtAuthorizationFilter(privateKey, authenticationManager()));
     // @formatter:on
   }
 
