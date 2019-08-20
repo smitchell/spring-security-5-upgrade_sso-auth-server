@@ -1,48 +1,74 @@
-# SPRING SECURITY REFERENCE IMPLEMENTATION
+# Proxy Example
 
-This project is my reference implementation of Spring Security 5. It is a simplified version of my production project that I can share.
+This is a Zuul Proxy example used to set-up integration tests. Currently, I´m testing Spring Security.
 
-## Summary
+### PROBLEM STATEMENT
 
-This project can be run in any of the following ways.
+For this integration test, create a PCF Space that includes a service registry and these micro-services:
+* **Angular Example** - If you bypass the proxy and go to the angular example route the page loads. [TRY IT](https://angular-example.test.medzero.cfapps.io/).
+* **Authentication Example** - If you bypass the proxy and go to the authentication server root you can sign in and access a protected page. [TRY IT](https://auth-example.test.medzero.cfapps.io/)
+* **Zuul Proxy Example** - If you try to access the angular example via the proxy you do not get the expected result. [TRY IT](https://zuul-proxy-example.test.medzero.cfapps.io/angular-example/)
 
-1) **JUnit tests** - Feel free to create a pull request with new test ideas.
-2) **Run Application.java** - For basic authentication tests you can run the project in your IDE at <http://localhost:8080>.
-3) **PCF DEV** - Deploy to pcf dev to do integration tests with the sister Zuul Proxy project (coming soon).
+#### Expected Result
+1) User tries to access the Angular site via an SSO-enabled proxy server.
+2) Spring Security on the proxy server redirects the user´s browser to the Login page on the authentication server.
+3) The user signs in and posts the Login form to the authentication server.
+4) The authentication server creates a JWT oauth2 token and forwards the user to the orginally requested Angular site.
 
-### Running this Project on PCF DEV
+#### Actual Results
+The authentication server forwards the user back to the Login page.
 
-Start pcf dev and sign in. Login with "user" and "pass".
+### How do I run this?
+
+Since we are using a Service Registry you must set the route in the manifest.yml file of all three projects, plus you must 
+set some URLs in the application.yml files of the proxy server and authentication server.
+
+#### Create a PCF Test Space for the Demo
+1) Create a new PCF test Space.
+2) Add a Service Registry.
+3) `cf login` or `cf t -s [space name]` to point to the new test space.
+
+### Start all three projects to generate the routes
+The easiest way to get start is to go ahead and build/push all three project for routes to be assigned.
+Next, add the routes to Proxy and Auth projects as shown below:
+
+#### Proxy Server
+1) Edit manifest.yml and change the route to match the assigned route above.
 ```
-cf dev start
-cf login -a https://api.local.pcfdev.io --skip-ssl-validation
-```
-Clone the project and switch to the project directory:
-```
-git clone https://github.com/smitchell/spring-security-5-upgrade_sso-auth-server.git
-cd [path-to-project]/spring-security-5-upgrade_sso-auth-server
+    routes:
+      - route: auth-example.cfapps.io <-- Use your assigned route
 ```
 
-Edit /src/main/resource/application.yml and make sure the URLS are set for pcf dev:
+2) Edit /src/main/resources/application.yml and change the following properties to match your the assigned routes:
 ```
 example:
-  auth-url: http://auth-example.local.pcfdev.io
-  proxy-url: http://zuul-proxy-example.local.pcfdev.io
+  proxy:
+    logout-url: [route assigned to your Proxy service]
 ```
 
-Build the project and push it to pcfdev.
+#### Spring Security 5 Upgrade SSO Auth Server
+1) Edit manifest.yml and change the route to match the assigned route above.
+2) Edit /src/main/resources/application.yml and change the following properties to match your the assigned routes:
 ```
-mvn clean install
-cf push
+example:
+  auth-url: [route assigned to your Auth service]
+  proxy-url: [route assigned to your Proxy service]
 ```
 
-Use the PCF Console to tail the logs
-1) Open your local <https://apps.local.pcfdev.io/>. Sign in with "user" "pass".
-2) Navigate to the pcfdev-space. The auth-example should be running with a route of <http://auth-example.local.pcfdev.io/>
-3) Click the "auth-example" hyperlink to open the app settings.
-4) Select the Logs tab.
+#### Angular Example
+1) Edit manifest.yml uncomment the route, and change it to match the assigned route above.
+```
+    routes:
+      - route: angular-example.cfapps.io <-- Use your assigned route
+```
+2) Bind the angular instance to the service registry
 
-Open the application in your browser
-1) Goto <http://auth-example.local.pcfdev.io>
-2) Sign in as "steve" "password".
-3) Click the logout button.
+### Test Your Setup
+1) Verify the Angular app is running by hitting its assigned route (i.e. [https://angular-example.cfapps.io]). Note, if the app is bound to the service register the context, /angular-example, will get appended to the URL when the page loads.
+2) Verify that the Authentication Server is running by hitting its assign route (i.e. [https://auth-example.cfapps.io/]). Sign in as steve/password.
+3) Verify the proxy is running by hitting its assigned route + /angular-example (i.e. [https://zuul-proxy-example.cfapps.io/angular-example/]). <-- Note the trailing slash
+
+It **should** load the angular page when you sign in, but as of this writing you get the /login page again instead.
+You may see "Full authentication is required to access this resource" when it attempts to redisplay the /login page.
+
+
