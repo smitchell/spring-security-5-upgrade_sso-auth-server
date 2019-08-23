@@ -1,12 +1,20 @@
 # Used in AuthClientDetailsService.generateRegisteredRedirectUrisCsv()
 # UPDATE THESE ROUTES WITH ROUTES FROM YOUR TEST ENVIRONMENT
 example:
-  auth-url: auth-example.cfapps.io
-  proxy-url: zuul-proxy-example.cfapps.io
+  auth-url: localhost:4202
+  proxy-url: localhost:4201
 
 management:
   cloudfoundry:
     skip-ssl-validation: true
+
+server:
+  servlet:
+    session:
+      cookie:
+        name: UISESSION
+      timeout: 60m
+  port: 4202
 
 spring:
   datasource:
@@ -40,8 +48,6 @@ logging:
     org.springframework.security: DEBUG
     org.springframework.security.oauth: DEBUG
     org.springframework.security.oauth.boot: DEBUG
-
-
 
 keyPair:
   # I generated this just for this example project
