@@ -2,7 +2,6 @@ package com.example.service.auth.service;
 
 import com.example.service.auth.domain.User;
 import com.example.service.auth.repository.UserRepository;
-import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +11,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Slf4j
 @ComponentScan({"com.medzero.client"})

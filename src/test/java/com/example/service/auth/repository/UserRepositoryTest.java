@@ -1,15 +1,5 @@
 package com.example.service.auth.repository;
 
-import static org.hamcrest.core.StringContains.containsString;
-import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import com.example.service.auth.domain.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
@@ -20,7 +10,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.json.AutoConfigureJsonTesters;
-import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -31,11 +20,16 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 
+import static org.hamcrest.core.StringContains.containsString;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 @AutoConfigureMockMvc
 @AutoConfigureJsonTesters
-@AutoConfigureRestDocs("target/snippets")
 public class UserRepositoryTest {
 
   @Autowired
@@ -57,10 +51,7 @@ public class UserRepositoryTest {
     )
         .andExpect(status().isCreated())
         .andExpect(header().string("Location", containsString(
-            "http://localhost:8080/users/"))) // Should be http://localhost/user/{valid-uuid}
-        .andDo(document("create-user",
-            preprocessRequest(prettyPrint()),
-            preprocessResponse(prettyPrint())))
+            "http://localhost/users/"))) // Should be http://localhost/user/{valid-uuid}
         .andReturn();
 
     String userId = result.getResponse().getHeader("Location")
@@ -129,9 +120,6 @@ public class UserRepositoryTest {
             .content(new ObjectMapper().writeValueAsString(updated))
     )
         .andExpect(status().isNoContent())
-        .andDo(document("update-password",
-            preprocessRequest(prettyPrint()),
-            preprocessResponse(prettyPrint())))
         .andReturn();
   }
 
@@ -163,9 +151,6 @@ public class UserRepositoryTest {
             .content(new ObjectMapper().writeValueAsString(updateStatus))
     )
         .andExpect(status().isNoContent())
-        .andDo(document("update-status",
-            preprocessRequest(prettyPrint()),
-            preprocessResponse(prettyPrint())))
         .andReturn();
   }
 

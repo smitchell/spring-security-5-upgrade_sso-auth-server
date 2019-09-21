@@ -3,8 +3,6 @@ package com.example.service.auth.controller;
 import com.example.service.auth.domain.User;
 import com.example.service.auth.repository.UserRepository;
 import com.example.service.auth.validation.ValidationRegex;
-import java.util.Optional;
-import javax.annotation.PostConstruct;
 import org.apache.commons.validator.routines.RegexValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +13,9 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.annotation.PostConstruct;
+import java.util.Optional;
 
 @RestController
 public class UserController {

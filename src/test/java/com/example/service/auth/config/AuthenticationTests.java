@@ -1,34 +1,12 @@
 package com.example.service.auth.config;
 
-import static com.example.service.auth.constants.SecurityConstants.OAUTH_AUTHORIZE_URL;
-import static com.example.service.auth.constants.SecurityConstants.OAUTH_TOKEN_URL;
-import static junit.framework.TestCase.assertNotNull;
-import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
-import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
-import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.cookie;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.forwardedUrl;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import com.example.service.auth.domain.Consumer;
 import com.example.service.auth.service.AuthClientDetailsService;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -42,10 +20,20 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static com.example.service.auth.constants.SecurityConstants.OAUTH_AUTHORIZE_URL;
+import static com.example.service.auth.constants.SecurityConstants.OAUTH_TOKEN_URL;
+import static junit.framework.TestCase.assertNotNull;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
-@AutoConfigureRestDocs("target/snippets")
 public class AuthenticationTests {
 
   @MockBean
@@ -85,14 +73,6 @@ public class AuthenticationTests {
         .with(httpBasic("dummy-client", "password"))
         .params(params))
         .andExpect(status().is2xxSuccessful())
-        .andDo(document("oauth-token",
-            preprocessResponse(prettyPrint()),
-            requestParameters(parameterWithName("username").description("username"),
-                parameterWithName("password").description("password"),
-                parameterWithName("client_id").description("consumer id"),
-                parameterWithName("client_secret").description("consumer secret (password) "),
-                parameterWithName("grant_type")
-                    .description("Oauth2 grant type being used by consumer"))))
         .andReturn();
   }
 
@@ -100,8 +80,8 @@ public class AuthenticationTests {
   public void authorizationRedirects() throws Exception {
     MvcResult result = mockMvc.perform(get(OAUTH_AUTHORIZE_URL))
         .andExpect(status().isFound())
-        .andExpect(header().string("Location", "http://localhost:8080/login"))
-        .andDo(document("authorize"))
+//        .andExpect(header().string("Location", "http://localhost:8080/login"))
+        .andExpect(header().string("Location", "http://localhost/login"))
         .andReturn();
   }
 
@@ -116,7 +96,6 @@ public class AuthenticationTests {
         .andDo(MockMvcResultHandlers.print())
         .andExpect(status().isFound())
         .andExpect(redirectedUrl("/"))
-        .andDo(document("login-submit"))
         .andReturn();
   }
 
@@ -160,7 +139,6 @@ public class AuthenticationTests {
         .andExpect(cookie().exists("SESSION"))
         .andExpect(status().isFound())
         .andExpect(header().string("Location", "/login?error"))
-        .andDo(document("login-submit"))
         .andReturn();
   }
 

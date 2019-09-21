@@ -1,9 +1,5 @@
 package com.example.service.auth.config;
 
-import static com.example.service.auth.constants.SecurityConstants.LOGIN;
-import static com.example.service.auth.constants.SecurityConstants.OAUTH_AUTHORIZE_URL;
-import static com.example.service.auth.constants.SecurityConstants.OAUTH_CONFIRM_ACCESS_URL;
-
 import com.example.service.auth.filter.JwtAuthenticationFilter;
 import com.example.service.auth.filter.JwtAuthorizationFilter;
 import com.example.service.auth.service.AuthUserDetailsService;
@@ -19,6 +15,8 @@ import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import static com.example.service.auth.constants.SecurityConstants.*;
 
 /**
  * For configuring the end users recognized by this Authorization Server

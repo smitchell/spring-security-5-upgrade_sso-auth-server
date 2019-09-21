@@ -12,18 +12,13 @@ server:
   servlet:
     session:
       cookie:
-        name: UISESSION
+        name: PROVIDER
       timeout: 60m
   port: 4202
 
 spring:
   datasource:
     url: jdbc:h2:mem:testdb;DB_CLOSE_ON_EXIT=FALSE;DB_CLOSE_DELAY=-1
-  main:
-    banner-mode: 'off'
-  output:
-    ansi:
-      enabled: ALWAYS
   jpa:
     generate-ddl: true
     hibernate:
@@ -39,13 +34,6 @@ info:
     version: @project.version@
 logging:
   level:
-    com.example.service.auth.Application: INFO
-    com.example.service.auth.service: INFO
-    com.example.service.auth.controller: INFO
-    com.example.service.auth.filter: DEBUG
-    org.springframework.security.oauth2: DEBUG
-    org.springframework.security.config: DEBUG
-    org.springframework.security: DEBUG
     org.springframework.security.oauth: DEBUG
     org.springframework.security.oauth.boot: DEBUG
 
