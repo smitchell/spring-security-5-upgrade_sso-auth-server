@@ -81,9 +81,3 @@ keyPair:
     dy2/66+kYg1un2mTTwx6KJKL+T2DtpGW4imunC6mT/RxbJa4Ys2w/P3pyBViNijo
     IwIDAQAB
     -----END PUBLIC KEY-----
-
-security:
-  oauth2:
-    client:
-      client-id: auth-example
-      client-secret: password
