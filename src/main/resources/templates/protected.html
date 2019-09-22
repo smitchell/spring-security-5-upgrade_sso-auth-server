@@ -18,14 +18,15 @@
       <img src="images/logo.jpg" alt="Spring logo">
     </div>
     <div class="col-sm-12 col-md-6 vertical-center">
-      <form th:action="@{/logout}" th:method="post">
+<!--      <form th:action="@{/logout}" th:method="post">-->
+      <form th:action="@{/logout}" th:method="get">
         <h2 style="margin-bottom: 40px">Welcome <span th:text="${#request.userPrincipal.principal.firstName}"></span></h2>
         <p>View the source code for this project on
           <a href="https://github.com/smitchell/spring-security-5-upgrade_sso-auth-server" target="_blank">Github</a>.</p>
         <div class="form-group">
           <button type="submit" class="btn btn-primary btn-lg pull-right btn-log">Log Out</button>
         </div>
-        <input type="hidden" id="csrf_token" name="${_csrf.parameterName}" value="${_csrf.token}" />
+<!--        <input type="hidden" id="csrf_token" name="${_csrf.parameterName}" value="${_csrf.token}" />-->
       </form>
     </div>
   </div>
