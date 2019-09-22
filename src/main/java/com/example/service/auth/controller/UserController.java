@@ -36,13 +36,13 @@ public class UserController {
   @PostConstruct
   public void postConstruct() {
     User user = null;
-    Optional<User> optional = userRepository.findById("steve");
+    Optional<User> optional = userRepository.findById("user");
     if (optional.isPresent()) {
       user = optional.get();
     } else {
       // Add a user of testing
       user = new User();
-      user.setUsername("steve");
+      user.setUsername("user");
       user.setPassword(new BCryptPasswordEncoder().encode("password"));
       user.setActive(true);
       user.setRoles("USER");
