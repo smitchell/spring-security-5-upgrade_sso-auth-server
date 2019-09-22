@@ -7,7 +7,7 @@ This is one of three projects referenced by https://github.com/spring-projects/s
 
 ## How to run this project locally
 
-1) The the Application class
+1) mvn spring-boot:run
 
 ## Validation
 

@@ -29,7 +29,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
   public JwtAuthenticationFilter(final String privateKey, AuthenticationManager authenticationManager) {
     this.authenticationManager = authenticationManager;
     this.privateKey = privateKey;
-    setFilterProcessesUrl(SecurityConstants.AUTH_LOGIN_URL);
+    setFilterProcessesUrl("/api/authenticate");
   }
 
   @Override

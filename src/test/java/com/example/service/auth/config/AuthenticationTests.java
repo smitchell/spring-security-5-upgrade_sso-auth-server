@@ -22,9 +22,6 @@ import org.springframework.util.MultiValueMap;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static com.example.service.auth.constants.SecurityConstants.OAUTH_AUTHORIZE_URL;
-import static com.example.service.auth.constants.SecurityConstants.OAUTH_TOKEN_URL;
 import static junit.framework.TestCase.assertNotNull;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -69,7 +66,7 @@ public class AuthenticationTests {
     params.add("username", "steve");
     params.add("password", "password");
 
-    MvcResult result = mockMvc.perform(post(OAUTH_TOKEN_URL)
+    MvcResult result = mockMvc.perform(post("/oauth/token")
         .with(httpBasic("dummy-client", "password"))
         .params(params))
         .andExpect(status().is2xxSuccessful())
@@ -78,7 +75,7 @@ public class AuthenticationTests {
 
   @Test
   public void authorizationRedirects() throws Exception {
-    MvcResult result = mockMvc.perform(get(OAUTH_AUTHORIZE_URL))
+    MvcResult result = mockMvc.perform(get("/oauth/authorize"))
         .andExpect(status().isFound())
 //        .andExpect(header().string("Location", "http://localhost:8080/login"))
         .andExpect(header().string("Location", "http://localhost/login"))
