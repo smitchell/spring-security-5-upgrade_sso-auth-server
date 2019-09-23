@@ -31,11 +31,15 @@ This is one of three projects referenced by https://github.com/spring-projects/s
 
 ## Illustrating the Problem
 
-To see the redirect out in action, remove "http://localhost:8085/login" from line 25 of the AuthClientDetailsService class.
-Restart the auth server and try the steps above again. You will get his error.
+In the sequence of calls below, you see that the redirect URL is "&redirect_uri=http://localhost:8085/login"
+instead of being "&redirect_uri=http://localhost:8085/angular-example". Something is setup wrong on the proxy server.
 
-```error="invalid_grant", error_description="Invalid redirect: http://localhost:8085/login does not match one of the registered values.```
-
-This shows that the authentication server redirects the user to "http://localhost:8085/login", the proxy server /login, after the user 
-successfully posts the authentication server /login, "http://localhost:8084/login", aka "http://auth-example/login".
-
+1) GET http://localhost:8085/angular-example/ 302
+2) GET Location: http://localhost:8085/login 302
+3) GET Location: http://localhost:8084/oauth/authorize?client_id=zuul-proxy-example&redirect_uri=http://localhost:8085/login&response_type=code&state=pgAptw 302
+4) GET http://localhost:8084/login 200
+5) POST http://localhost:8084/login 302 (user logs in with user/password)
+6) GOT Request URL: http://localhost:8084/oauth/authorize?client_id=zuul-proxy-example&redirect_uri=http://localhost:8085/login&response_type=code&state=aFcXyH 200
+7) POST http://localhost:8084/oauth/authorize (user clicks Accept on 3rd party auth page)
+8) GET http://localhost:8085/login?code=9jlmH7&state=aFcXyH 302
+9) GET http://localhost:8085/angular-example/ 200
