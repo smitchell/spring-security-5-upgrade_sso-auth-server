@@ -28,8 +28,8 @@ info:
     version: @project.version@
 logging:
   level:
-    org.springframework.security.oauth: DEBUG
-    org.springframework.security.oauth.boot: DEBUG
+    ROOT: WARN
+    org.springframework.security: DEBUG
 
 keyPair:
   # I generated this just for this example project
