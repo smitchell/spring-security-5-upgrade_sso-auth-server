@@ -43,3 +43,20 @@ instead of being "&redirect_uri=http://localhost:8085/angular-example". Somethin
 7) POST http://localhost:8084/oauth/authorize (user clicks Accept on 3rd party auth page)
 8) GET http://localhost:8085/login?code=9jlmH7&state=aFcXyH 302
 9) GET http://localhost:8085/angular-example/ 200
+
+In Prod, with a Spring Security 5 client on the Zuul proxy calling a Spring Security 4 Authentication Server, there is 301 on the proxy login page 
+that is missing when running this code locally. The extra 301 is returned for https://hostname/login before and after the custom login page. 
+Note that on step 9, the proxy server redirects to the originally requested URI. That is what is missing after upgrading the auth server 
+to Spring Security 5.
+
+1. GET https://[hostname]/[context-path] 200
+2. GET https://[hostname]/login 301 Moved Permanently Location: https://hostname/login
+3. GET https://[hostname]/login 302 
+4. GET https://[auth server host]/oauth/authorize?client_id=[a client]&redirect_uri=http://[hostname]/login&response_type=code&state=5FYUGh 302
+5. GET https://[auth server host]/login 200
+6. POST https://[auth server host]/login 302 (custom login with user/password)
+7. GET https://[auth server host]/oauth/authorize?client_id=[a client]&redirect_uri=http://[hostname]/login&response_type=code&state=5FYUGh 302
+8. GET http://[hostname]/login?code=dzJlPi&state=5FYUGh 301
+9. GET http://[hostname]/login?code=dzJlPi&state=5FYUGh 302 location: https://[hostname]/[context-path]
+10. https://[hostname]/[context-path] 200
+
