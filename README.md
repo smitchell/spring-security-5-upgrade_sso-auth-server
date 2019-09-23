@@ -12,8 +12,8 @@ This is one of three projects referenced by https://github.com/spring-projects/s
 ## Validation
 
 1) Open the Angular App directly: http://localhost:4200/angular-example/
-2) Sign into Spring Security directly: http://localhost:4202/
-1) Access the Angular App via the proxy: http://localhost:4201/angular-example/
+2) Sign into Spring Security directly: http://localhost:8084/
+1) Access the Angular App via the proxy: http://localhost:8085/angular-example/
 
 
 

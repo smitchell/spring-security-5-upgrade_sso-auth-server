@@ -13,39 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class AuthClientDetailsService implements ClientDetailsService {
 
-  private final String authServiceUrl;
-  private final String proxyServiceUrl;
-
-  @Autowired
-  public AuthClientDetailsService(
-      @Value("${example.auth-url}") final String authServiceUrl,
-      @Value("${example.proxy-url}") final String proxyServiceUrl
-  ) {
-    this.authServiceUrl = authServiceUrl;
-    this.proxyServiceUrl = proxyServiceUrl;
-  }
-
-  /**
-   * This is a quick and dirty convenience method to set-up the app for the proxy integration test.
-   * @return
-   */
-  private String generateRegisteredRedirectUrisCsv() {
-    final String HTTP = "http://";
-    final String HTTPS = "https://";
-    StringBuilder sb = new StringBuilder();
-    for (String value : new String[]{"/", "/login", "/angular-example"}) {
-      sb.append(generateRegisteredRedirectUri(HTTP, authServiceUrl, value));
-      sb.append(generateRegisteredRedirectUri(HTTPS, authServiceUrl, value));
-      sb.append(generateRegisteredRedirectUri(HTTP, proxyServiceUrl, value));
-      sb.append(generateRegisteredRedirectUri(HTTPS, proxyServiceUrl, value));
-    }
-    return sb.toString().substring(0, sb.toString().length() - 1);
-  }
-
-  private String generateRegisteredRedirectUri(String protocol, String baseUrl, String context) {
-    return protocol.concat(baseUrl).concat(context).concat(",") ;
-  }
-
   @Override
   @Transactional
   public ClientDetails loadClientByClientId(String clientId) {
@@ -55,7 +22,7 @@ public class AuthClientDetailsService implements ClientDetailsService {
     consumer.setAccessTokenValiditySeconds(100);
     consumer.setRefreshTokenValiditySeconds(100);
     consumer.setClientId(clientId);
-    consumer.setRegisteredRedirectUrisCsv(generateRegisteredRedirectUrisCsv());
+    consumer.setRegisteredRedirectUrisCsv("http://localhost:8085/,http://localhost:8085/login,http://localhost:8085/angular-example/,http://localhost:8084/login");
     consumer.setClientSecret(new BCryptPasswordEncoder().encode("password"));
     return  consumer;
   }
