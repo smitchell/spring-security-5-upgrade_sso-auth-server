@@ -23,6 +23,7 @@ public class AuthClientDetailsService implements ClientDetailsService {
     consumer.setRefreshTokenValiditySeconds(100);
     consumer.setClientId(clientId);
     consumer.setRegisteredRedirectUrisCsv("http://localhost:8085/,http://localhost:8085/login,http://localhost:8085/angular-example/,http://localhost:8084/login");
+//    consumer.setRegisteredRedirectUrisCsv("http://localhost:8085/,http://localhost:8085/angular-example/,http://localhost:8084/login");
     consumer.setClientSecret(new BCryptPasswordEncoder().encode("password"));
     return  consumer;
   }
