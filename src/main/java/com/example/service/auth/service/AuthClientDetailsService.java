@@ -16,15 +16,15 @@ public class AuthClientDetailsService implements ClientDetailsService {
   @Override
   @Transactional
   public ClientDetails loadClientByClientId(String clientId) {
+    // Return this no matter what clientId is passed in.
     Consumer consumer = new Consumer();
-    consumer.setScopeCsv("read,write");
+    consumer.setScopeCsv("read,write,trust");
     consumer.setAuthorizedGrantTypesCsv("password,refresh_token,authorization_code");
     consumer.setAccessTokenValiditySeconds(100);
     consumer.setRefreshTokenValiditySeconds(100);
     consumer.setClientId(clientId);
-    consumer.setRegisteredRedirectUrisCsv("http://localhost:8085/,http://localhost:8085/login,http://localhost:8085/angular-example/,http://localhost:8084/login");
-//    consumer.setRegisteredRedirectUrisCsv("http://localhost:8085/,http://localhost:8085/angular-example/,http://localhost:8084/login");
-    consumer.setClientSecret(new BCryptPasswordEncoder().encode("password"));
+    consumer.setRegisteredRedirectUrisCsv("http://localhost:8085/login,");
+    consumer.setClientSecret(new BCryptPasswordEncoder().encode("client-secret"));
     return  consumer;
   }
 }
