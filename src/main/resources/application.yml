@@ -3,11 +3,6 @@ management:
     skip-ssl-validation: true
 
 server:
-  servlet:
-    session:
-      cookie:
-        name: PROVIDER
-      timeout: 60m
   port: 8084
 
 spring:
@@ -18,8 +13,6 @@ spring:
     hibernate:
       ddl-auto: create
     open-in-view: false
-  profiles:
-    active: test
   session:
     store-type: jdbc
 

@@ -34,6 +34,13 @@ import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
+import org.springframework.web.servlet.view.RedirectView;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 /**
  * An instance of Legacy Authorization Server (spring-security-oauth2) that uses a single,
@@ -98,6 +105,26 @@ public class AuthServerConfig extends AuthorizationServerConfigurerAdapter {
         .accessTokenConverter(jwtAccessTokenConverter())
         .userDetailsService(authUserDetailsService)
         .tokenStore(tokenStore());
+
+    //Invalidate the session once the user has been authenticated
+    endpoints.addInterceptor(new HandlerInterceptorAdapter() {
+      @Override
+      public void postHandle(HttpServletRequest request,
+                             HttpServletResponse response, Object handler,
+                             ModelAndView modelAndView) throws Exception {
+        if (modelAndView != null
+                && modelAndView.getView() instanceof RedirectView) {
+          RedirectView redirect = (RedirectView) modelAndView.getView();
+          String url = redirect.getUrl();
+          if (url.contains("code=") || url.contains("error=")) {
+            HttpSession session = request.getSession(false);
+            if (session != null) {
+              session.invalidate();
+            }
+          }
+        }
+      }
+    });
   }
 
   @Bean
