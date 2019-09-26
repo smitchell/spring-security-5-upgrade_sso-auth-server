@@ -19,6 +19,7 @@ public class AuthClientDetailsService implements ClientDetailsService {
     // Return this no matter what clientId is passed in.
     Consumer consumer = new Consumer();
     consumer.setScopeCsv("read,write,trust");
+    consumer.setAutoApproveCsv("true"); // <---- THIS FIXED THE PERMISSION POPUP
     consumer.setAuthorizedGrantTypesCsv("password,refresh_token,authorization_code");
     consumer.setAccessTokenValiditySeconds(100);
     consumer.setRefreshTokenValiditySeconds(100);
