@@ -50,7 +50,7 @@ public class AuthenticationTests {
     consumer.setRefreshTokenValiditySeconds(100);
     consumer.setClientId("dummy-client");
     consumer.setRegisteredRedirectUrisCsv("https://test.domain.com/context1,https://test.domain.com/context2,https://test.domain.com/context3");
-    consumer.setClientSecret(new BCryptPasswordEncoder().encode("password"));
+    consumer.setClientSecret(new BCryptPasswordEncoder().encode("client-secret"));
     this.clientDetails = consumer;
 
     Mockito.when(this.authClientDetailsService.loadClientByClientId("dummy-client"))
@@ -62,12 +62,12 @@ public class AuthenticationTests {
     MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
     params.add("grant_type", "password");
     params.add("client_id", "dummy-client");
-    params.add("client_secret", "password");
-    params.add("username", "steve");
+    params.add("client_secret", "client-secret");
+    params.add("username", "user");
     params.add("password", "password");
 
     MvcResult result = mockMvc.perform(post("/oauth/token")
-        .with(httpBasic("dummy-client", "password"))
+        .with(httpBasic("dummy-client", "client-secret"))
         .params(params))
         .andExpect(status().is2xxSuccessful())
         .andReturn();
@@ -85,7 +85,7 @@ public class AuthenticationTests {
   @Test
   public void loginSucceeds() throws Exception {
     MultiValueMap<String, String> form = new LinkedMultiValueMap<String, String>();
-    form.set("username", "steve");
+    form.set("username", "user");
     form.set("password", "password");
 
     mockMvc.perform(post("/login")
@@ -127,7 +127,7 @@ public class AuthenticationTests {
   @Test
   public void loginFailure() throws Exception {
     MultiValueMap<String, String> form = new LinkedMultiValueMap<String, String>();
-    form.set("username", "steve");
+    form.set("username", "user");
     form.set("password", "notpassword");
 
     mockMvc.perform(post("/login")
